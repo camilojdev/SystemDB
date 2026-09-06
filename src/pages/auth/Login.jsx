@@ -60,7 +60,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                Usuario
+                Usuario o correo
               </label>
               <input
                 type="text"
@@ -68,7 +68,7 @@ export default function Login() {
                 onChange={(e) =>
                   setForm({ ...form, nombreUsuario: e.target.value })
                 }
-                placeholder="admin"
+                placeholder="Ingresa tu usuario o correo"
                 className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
@@ -87,6 +87,15 @@ export default function Login() {
                 className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => navigate('/recuperar-contrasena')}
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div> 
 
             {error && (
               <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-4 py-3">
