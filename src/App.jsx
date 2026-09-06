@@ -4,6 +4,7 @@ import useAuthStore from './store/authStore'
 import useCajaStore from './store/cajaStore'
 import { getCajaActual } from './api/caja'
 import Login from './pages/auth/Login'
+import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 import Layout from './components/layout/Layout'
 
 function RutaProtegida({ children }) {
@@ -28,6 +29,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
         <Route
           path="/*"
           element={
