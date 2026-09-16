@@ -6,6 +6,7 @@ import { getCajaActual } from './api/caja'
 import Login from './pages/auth/Login'
 import RecuperarContrasena from './pages/auth/RecuperarContrasena'
 import Layout from './components/layout/Layout'
+import './store/themeStore' // aplica el tema guardado antes de renderizar nada
 
 function RutaProtegida({ children }) {
   const token = useAuthStore((s) => s.token)
