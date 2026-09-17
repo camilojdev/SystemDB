@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 17.5px; 
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 transition-colors;
+  }
+  .text-heading {
+    @apply text-gray-800 dark:text-slate-100;
+  }
+  .text-muted {
+    @apply text-gray-500 dark:text-slate-400;
+  }
+}
