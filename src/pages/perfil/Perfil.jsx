@@ -13,7 +13,7 @@ import {
 } from '../../api/perfil'
 import useAuthStore from '../../store/authStore'
 import useThemeStore from '../../store/themeStore'
-import { Camera, Trash2, Sun, Moon, Mail, Lock, User as UserIcon } from 'lucide-react'
+import { Camera, Trash2, Sun, Moon, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react'
 
 export default function Perfil() {
   const queryClient = useQueryClient()
@@ -36,14 +36,14 @@ export default function Perfil() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mi perfil</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h1 className="text-3xl font-bold text-heading">Mi perfil</h1>
+        <p className="text-base text-muted">
           Administra tu información personal, tu contraseña y la apariencia del sistema.
         </p>
       </div>
 
       {isLoading ? (
-        <p className="text-gray-500 dark:text-gray-400">Cargando...</p>
+        <p className="text-muted">Cargando...</p>
       ) : (
         <>
           <SeccionFoto
@@ -75,10 +75,10 @@ export default function Perfil() {
 
 function Tarjeta({ titulo, icono: Icono, children }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-gray-200 dark:border-gray-700">
+    <div className="card">
       <div className="flex items-center gap-2 mb-4">
         {Icono && <Icono size={18} className="text-blue-600 dark:text-blue-400" />}
-        <h2 className="font-semibold text-gray-900 dark:text-white">{titulo}</h2>
+        <h2 className="text-lg font-semibold text-heading">{titulo}</h2>
       </div>
       {children}
     </div>
@@ -139,13 +139,13 @@ function SeccionFoto({ perfil, inputFotoRef, onExito }) {
                 type="button"
                 onClick={() => eliminar()}
                 disabled={subiendo || eliminando}
-                className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-60 text-gray-700 dark:text-gray-200 rounded-lg transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-60 text-heading rounded-lg transition-colors flex items-center gap-1"
               >
                 <Trash2 size={14} /> Quitar
               </button>
             )}
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">JPG, PNG o WEBP. Máximo 5 MB.</p>
+          <p className="text-xs text-muted">JPG, PNG o WEBP. Máximo 5 MB.</p>
           {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
         </div>
         <input
@@ -190,7 +190,7 @@ function SeccionNombre({ perfil, onExito }) {
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
-          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
@@ -234,8 +234,8 @@ function SeccionCorreo({ perfil, onExito }) {
 
   return (
     <Tarjeta titulo="Correo electrónico" icono={Mail}>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-        Correo actual: <span className="font-medium">{perfil?.correo}</span>
+      <p className="text-sm text-muted mb-3">
+        Correo actual: <span className="font-medium text-heading">{perfil?.correo}</span>
       </p>
 
       {paso === 'inicial' ? (
@@ -245,7 +245,7 @@ function SeccionCorreo({ perfil, onExito }) {
             placeholder="Nuevo correo"
             value={correoNuevo}
             onChange={(e) => setCorreoNuevo(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
@@ -257,8 +257,8 @@ function SeccionCorreo({ perfil, onExito }) {
         </form>
       ) : (
         <form onSubmit={(e) => { e.preventDefault(); setError(''); confirmar() }} className="space-y-3">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Enviamos un código a <span className="font-medium">{correoNuevo}</span>. Ingrésalo para confirmar el cambio.
+          <p className="text-xs text-muted">
+            Enviamos un código a <span className="font-medium text-heading">{correoNuevo}</span>. Ingrésalo para confirmar el cambio.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -268,7 +268,7 @@ function SeccionCorreo({ perfil, onExito }) {
               placeholder="123456"
               value={codigo}
               onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
-              className="w-full sm:w-40 px-3 py-2 text-center tracking-[0.4em] font-mono border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-40 px-3 py-2 text-center tracking-[0.4em] font-mono bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="submit"
@@ -280,7 +280,7 @@ function SeccionCorreo({ perfil, onExito }) {
             <button
               type="button"
               onClick={() => { setPaso('inicial'); setCodigo(''); setError('') }}
-              className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
+              className="text-sm text-muted hover:underline"
             >
               Cancelar
             </button>
@@ -360,14 +360,14 @@ function SeccionContrasena() {
         <button
           type="button"
           onClick={() => { setModo('actual'); setError(''); setMensaje(''); limpiarCampos(); setPasoCodigo('inicial') }}
-          className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${modo === 'actual' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+          className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${modo === 'actual' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-heading'}`}
         >
           Con mi contraseña actual
         </button>
         <button
           type="button"
           onClick={() => { setModo('codigo'); setError(''); setMensaje(''); limpiarCampos(); setPasoCodigo('inicial') }}
-          className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${modo === 'codigo' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+          className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${modo === 'codigo' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-slate-700 text-heading'}`}
         >
           Con código al correo
         </button>
@@ -384,7 +384,7 @@ function SeccionContrasena() {
         </form>
       ) : pasoCodigo === 'inicial' ? (
         <div className="space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-muted">
             Paso 1 de 2: te enviaremos un código de verificación a tu correo registrado. Después de recibirlo, podrás escribir tu nueva contraseña.
           </p>
           <button type="button" onClick={() => { setError(''); pedirCodigo() }} disabled={pidiendoCodigo} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
@@ -400,7 +400,7 @@ function SeccionContrasena() {
             <button type="submit" disabled={confirmandoCodigo} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
               {confirmandoCodigo ? 'Guardando...' : 'Confirmar y cambiar'}
             </button>
-            <button type="button" onClick={() => pedirCodigo()} disabled={pidiendoCodigo} className="text-sm text-gray-500 dark:text-gray-400 hover:underline">
+            <button type="button" onClick={() => pedirCodigo()} disabled={pidiendoCodigo} className="text-sm text-muted hover:underline">
               Reenviar código
             </button>
           </div>
@@ -414,17 +414,33 @@ function SeccionContrasena() {
 }
 
 function Campo({ label, tipo, valor, onChange, ayuda, maxLength }) {
+  const [mostrar, setMostrar] = useState(false)
+  const esPassword = tipo === 'password'
+
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
-      <input
-        type={tipo}
-        value={valor}
-        maxLength={maxLength}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      {ayuda && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ayuda}</p>}
+      <label className="block text-sm font-medium text-heading mb-1">{label}</label>
+      <div className="relative">
+        <input
+          type={esPassword ? (mostrar ? 'text' : 'password') : tipo}
+          value={valor}
+          maxLength={maxLength}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full px-3 py-2 ${esPassword ? 'pr-10' : ''} bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        />
+        {esPassword && (
+          <button
+            type="button"
+            onClick={() => setMostrar((v) => !v)}
+            tabIndex={-1}
+            aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
+          >
+            {mostrar ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        )}
+      </div>
+      {ayuda && <p className="text-xs text-muted mt-1">{ayuda}</p>}
     </div>
   )
 }
@@ -434,13 +450,13 @@ function SeccionApariencia({ tema, alternarTema }) {
     <Tarjeta titulo="Apariencia" icono={tema === 'oscuro' ? Moon : Sun}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-700 dark:text-gray-300">Modo {tema === 'oscuro' ? 'oscuro' : 'claro'}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Se mantiene en este dispositivo aunque cierres sesión.</p>
+          <p className="text-sm text-heading">Modo {tema === 'oscuro' ? 'oscuro' : 'claro'}</p>
+          <p className="text-xs text-muted">Se mantiene en este dispositivo aunque cierres sesión.</p>
         </div>
         <button
           type="button"
           onClick={alternarTema}
-          className={`relative w-14 h-8 rounded-full transition-colors ${tema === 'oscuro' ? 'bg-blue-600' : 'bg-gray-300'}`}
+          className={`relative w-14 h-8 rounded-full transition-colors ${tema === 'oscuro' ? 'bg-blue-600' : 'bg-gray-300 dark:bg-slate-600'}`}
         >
           <span className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform flex items-center justify-center ${tema === 'oscuro' ? 'translate-x-6' : 'translate-x-0'}`}>
             {tema === 'oscuro' ? <Moon size={14} className="text-blue-600" /> : <Sun size={14} className="text-yellow-500" />}

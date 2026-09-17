@@ -302,17 +302,17 @@ export default function Reportes() {
   ]
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Reportes</h1>
-        <p className="text-gray-500 text-sm mt-1">Análisis y exportación de datos</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-heading">Reportes</h1>
+        <p className="text-muted text-base mt-1">Análisis y exportación de datos</p>
       </div>
 
-      <div className="flex gap-1 border-b border-gray-200 flex-wrap">
+      <div className="flex gap-1 border-b border-gray-200 dark:border-slate-700 overflow-x-auto">
         {TABS.map(({ key, label, icon: Icon }) => (
           <button key={key} onClick={() => setTab(key)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              tab === key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              tab === key ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-muted hover:text-heading'
             }`}>
             <Icon size={15} />{label}
           </button>
@@ -321,17 +321,17 @@ export default function Reportes() {
 
       {/* Tab ventas */}
       {tab === 'ventas' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="card space-y-4">
           <div className="flex items-end gap-3 flex-wrap">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Desde</label>
+              <label className="block text-xs font-medium text-muted mb-1">Desde</label>
               <input type="date" value={desde} onChange={(e) => { setDesde(e.target.value); setBuscar(0) }}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Hasta</label>
+              <label className="block text-xs font-medium text-muted mb-1">Hasta</label>
               <input type="date" value={hasta} onChange={(e) => { setHasta(e.target.value); setBuscar(0) }}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <button onClick={() => setBuscar((n) => n + 1)}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
@@ -339,7 +339,7 @@ export default function Reportes() {
             </button>
             {ventas.length > 0 && (
               <button onClick={() => pdfVentas(ventas, desde, hasta)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                 <Download size={14} /> PDF
               </button>
             )}
@@ -347,58 +347,60 @@ export default function Reportes() {
           {cargandoVentas && <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>}
           {ventas.length > 0 && !cargandoVentas && (
             <>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Total ventas</p>
-                  <p className="text-2xl font-bold text-gray-800">{ventas.length}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Total ventas</p>
+                  <p className="text-2xl font-bold text-heading">{ventas.length}</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Ingresos</p>
-                  <p className="text-xl font-bold text-green-700">{fmtCOP(ventas.reduce((s, v) => s + (v.totalCop || 0), 0))}</p>
+                <div className="bg-green-50 dark:bg-green-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Ingresos</p>
+                  <p className="text-xl font-bold text-green-700 dark:text-green-400">{fmtCOP(ventas.reduce((s, v) => s + (v.totalCop || 0), 0))}</p>
                 </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Ticket promedio</p>
-                  <p className="text-xl font-bold text-blue-700">{fmtCOP(ventas.reduce((s, v) => s + (v.totalCop || 0), 0) / ventas.length)}</p>
+                <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Ticket promedio</p>
+                  <p className="text-xl font-bold text-blue-700 dark:text-blue-400">{fmtCOP(ventas.reduce((s, v) => s + (v.totalCop || 0), 0) / ventas.length)}</p>
                 </div>
               </div>
+              <div className="overflow-x-auto max-h-[60vh]">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Cliente</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Método</th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Items</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Total</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Fecha</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Cliente</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Método</th>
+                    <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Items</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Total</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Fecha</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                   {ventas.map((v) => (
-                    <tr key={v.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm">{v.nombreCliente || 'Ocasional'}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{v.metodoPago}</td>
-                      <td className="px-4 py-3 text-center text-sm">{v.cantidadItems}</td>
-                      <td className="px-4 py-3 text-right text-sm font-medium">{fmtCOP(v.totalCop)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{formatFecha(v.fecha)}</td>
+                    <tr key={v.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                      <td className="px-4 py-3 text-sm text-heading">{v.nombreCliente || 'Ocasional'}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{v.metodoPago}</td>
+                      <td className="px-4 py-3 text-center text-sm text-heading">{v.cantidadItems}</td>
+                      <td className="px-4 py-3 text-right text-sm font-medium text-heading">{fmtCOP(v.totalCop)}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{formatFecha(v.fecha)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </>
           )}
           {buscar > 0 && !cargandoVentas && ventas.length === 0 && (
-            <p className="text-gray-400 text-sm text-center py-8">Sin ventas en ese período</p>
+            <p className="text-muted text-sm text-center py-8">Sin ventas en ese período</p>
           )}
         </div>
       )}
 
       {/* Tab inventario */}
       {tab === 'inventario' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-700">Reporte de inventario</h2>
+            <h2 className="text-lg font-semibold text-heading">Reporte de inventario</h2>
             {inventario.length > 0 && (
               <button onClick={() => pdfInventario(inventario)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                 <Download size={14} /> PDF
               </button>
             )}
@@ -406,51 +408,53 @@ export default function Reportes() {
           {!inventarioData ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
           ) : inventario.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">Sin productos</p>
+            <p className="text-muted text-sm text-center py-8">Sin productos</p>
           ) : (
+            <div className="overflow-x-auto max-h-[60vh]">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                 <tr>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Producto</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Categoría</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Stock</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Mínimo</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Precio</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Estado</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Producto</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Categoría</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Stock</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Mínimo</th>
+                  <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Precio</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                 {inventario.map((p, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-800">{p.nombre}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{p.categoria || '—'}</td>
-                    <td className={`px-4 py-3 text-center text-sm font-bold ${p.stockActual === 0 ? 'text-red-600' : p.stockBajo ? 'text-yellow-600' : 'text-gray-800'}`}>{p.stockActual}</td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-500">{p.stockMinimo}</td>
-                    <td className="px-4 py-3 text-right text-sm">{fmtCOP(p.precioVentaDetal)}</td>
+                  <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                    <td className="px-4 py-3 text-sm font-medium text-heading">{p.nombre}</td>
+                    <td className="px-4 py-3 text-sm text-muted">{p.categoria || '—'}</td>
+                    <td className={`px-4 py-3 text-center text-sm font-bold ${p.stockActual === 0 ? 'text-red-600 dark:text-red-400' : p.stockBajo ? 'text-yellow-600 dark:text-yellow-400' : 'text-heading'}`}>{p.stockActual}</td>
+                    <td className="px-4 py-3 text-center text-sm text-muted">{p.stockMinimo}</td>
+                    <td className="px-4 py-3 text-right text-sm text-heading">{fmtCOP(p.precioVentaDetal)}</td>
                     <td className="px-4 py-3 text-center">
                       {p.stockActual === 0
-                        ? <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full">Agotado</span>
+                        ? <span className="px-2 py-0.5 text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300 rounded-full">Agotado</span>
                         : p.stockBajo
-                          ? <span className="px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">Stock bajo</span>
-                          : <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">OK</span>}
+                          ? <span className="px-2 py-0.5 text-xs font-medium bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 rounded-full">Stock bajo</span>
+                          : <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 rounded-full">OK</span>}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}
 
       {/* Tab lista de precios */}
       {tab === 'precios' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-700">Lista de precios</h2>
+        <div className="card">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-lg font-semibold text-heading">Lista de precios</h2>
             {listaPrecios.length > 0 && (
               <div className="flex items-center gap-2">
                 <button onClick={() => pdfListaPrecios(listaPrecios)}
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                   <Download size={14} /> PDF
                 </button>
                 <button onClick={() => excelListaPrecios(listaPrecios)}
@@ -463,40 +467,42 @@ export default function Reportes() {
           {!listaPreciosData ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
           ) : listaPrecios.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">No hay productos en la lista de precios</p>
+            <p className="text-muted text-sm text-center py-8">No hay productos en la lista de precios</p>
           ) : (
+            <div className="overflow-x-auto max-h-[60vh]">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                 <tr>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Producto</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Código</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Categoría</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Precio</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Producto</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Código</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Categoría</th>
+                  <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Precio</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                 {listaPrecios.map((p, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-800">{p.nombre}</td>
-                    <td className="px-4 py-3 text-sm font-mono text-gray-500">{p.codigo}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{p.categoriaNombre || '—'}</td>
-                    <td className="px-4 py-3 text-right text-sm font-semibold">{fmtCOP(p.precioVentaDetal)}</td>
+                  <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                    <td className="px-4 py-3 text-sm font-medium text-heading">{p.nombre}</td>
+                    <td className="px-4 py-3 text-sm font-mono text-muted">{p.codigo}</td>
+                    <td className="px-4 py-3 text-sm text-muted">{p.categoriaNombre || '—'}</td>
+                    <td className="px-4 py-3 text-right text-sm font-semibold text-heading">{fmtCOP(p.precioVentaDetal)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}
 
       {/* Tab créditos */}
       {tab === 'creditos' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="card space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-700">Cartera de créditos</h2>
+            <h2 className="text-lg font-semibold text-heading">Cartera de créditos</h2>
             {clientesCredito.length > 0 && (
               <button onClick={() => pdfCreditos(clientesCredito)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                 <Download size={14} /> PDF
               </button>
             )}
@@ -505,43 +511,45 @@ export default function Reportes() {
           {!clientesData ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
           ) : clientesCredito.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">No hay créditos activos</p>
+            <p className="text-muted text-sm text-center py-8">No hay créditos activos</p>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Clientes con crédito</p>
-                  <p className="text-2xl font-bold text-gray-800">{clientesCredito.length}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Clientes con crédito</p>
+                  <p className="text-2xl font-bold text-heading">{clientesCredito.length}</p>
                 </div>
-                <div className="bg-red-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Total por cobrar</p>
-                  <p className="text-xl font-bold text-red-700">{fmtCOP(totalDeuda)}</p>
+                <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Total por cobrar</p>
+                  <p className="text-xl font-bold text-red-700 dark:text-red-400">{fmtCOP(totalDeuda)}</p>
                 </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Promedio por cliente</p>
-                  <p className="text-xl font-bold text-blue-700">{fmtCOP(totalDeuda / clientesCredito.length)}</p>
+                <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Promedio por cliente</p>
+                  <p className="text-xl font-bold text-blue-700 dark:text-blue-400">{fmtCOP(totalDeuda / clientesCredito.length)}</p>
                 </div>
               </div>
+              <div className="overflow-x-auto max-h-[60vh]">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Cliente</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Identificación</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Total deuda</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Saldo pendiente</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Cliente</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Identificación</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Total deuda</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Saldo pendiente</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                   {[...clientesCredito].sort((a, b) => b.saldoCreditoCop - a.saldoCreditoCop).map((c) => (
-                    <tr key={c.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{c.nombreCompleto}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{c.tipoIdentificacion} {c.numeroIdentificacion}</td>
-                      <td className="px-4 py-3 text-right text-sm">{fmtCOP(c.cupoCreditoCop)}</td>
-                      <td className="px-4 py-3 text-right text-sm font-semibold text-red-600">{fmtCOP(c.saldoCreditoCop)}</td>
+                    <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                      <td className="px-4 py-3 text-sm font-medium text-heading">{c.nombreCompleto}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{c.tipoIdentificacion} {c.numeroIdentificacion}</td>
+                      <td className="px-4 py-3 text-right text-sm text-heading">{fmtCOP(c.cupoCreditoCop)}</td>
+                      <td className="px-4 py-3 text-right text-sm font-semibold text-red-600 dark:text-red-400">{fmtCOP(c.saldoCreditoCop)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </>
           )}
         </div>
@@ -549,12 +557,12 @@ export default function Reportes() {
 
       {/* Tab mecánicos */}
       {tab === 'mecanicos' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="card space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-700">Rendimiento por mecánico</h2>
+            <h2 className="text-lg font-semibold text-heading">Rendimiento por mecánico</h2>
             {mecanicos.length > 0 && (
               <button onClick={() => pdfMecanicos(otsAll)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                 <Download size={14} /> PDF
               </button>
             )}
@@ -563,45 +571,47 @@ export default function Reportes() {
           {!tallerData ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
           ) : mecanicos.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">Sin datos de mecánicos</p>
+            <p className="text-muted text-sm text-center py-8">Sin datos de mecánicos</p>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Total OTs</p>
-                  <p className="text-2xl font-bold text-gray-800">{otsAll.length}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Total OTs</p>
+                  <p className="text-2xl font-bold text-heading">{otsAll.length}</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Total facturado</p>
-                  <p className="text-xl font-bold text-green-700">{fmtCOP(otsAll.reduce((s, o) => s + (o.granTotalCop || 0), 0))}</p>
+                <div className="bg-green-50 dark:bg-green-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Total facturado</p>
+                  <p className="text-xl font-bold text-green-700 dark:text-green-400">{fmtCOP(otsAll.reduce((s, o) => s + (o.granTotalCop || 0), 0))}</p>
                 </div>
-                <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Mecánicos activos</p>
-                  <p className="text-2xl font-bold text-blue-700">{mecanicos.filter(m => m.nombre !== 'Sin asignar').length}</p>
+                <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Mecánicos activos</p>
+                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{mecanicos.filter(m => m.nombre !== 'Sin asignar').length}</p>
                 </div>
               </div>
+              <div className="overflow-x-auto max-h-[60vh]">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Mecánico</th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">OTs totales</th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Entregadas</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Total facturado</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Promedio/OT</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Mecánico</th>
+                    <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">OTs totales</th>
+                    <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Entregadas</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Total facturado</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Promedio/OT</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                   {[...mecanicos].sort((a, b) => b.total - a.total).map((m, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{m.nombre}</td>
-                      <td className="px-4 py-3 text-center text-sm">{m.ots}</td>
-                      <td className="px-4 py-3 text-center text-sm text-green-600 font-medium">{m.entregadas}</td>
-                      <td className="px-4 py-3 text-right text-sm font-semibold">{fmtCOP(m.total)}</td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-500">{fmtCOP(m.promedio)}</td>
+                    <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                      <td className="px-4 py-3 text-sm font-medium text-heading">{m.nombre}</td>
+                      <td className="px-4 py-3 text-center text-sm text-heading">{m.ots}</td>
+                      <td className="px-4 py-3 text-center text-sm text-green-600 dark:text-green-400 font-medium">{m.entregadas}</td>
+                      <td className="px-4 py-3 text-right text-sm font-semibold text-heading">{fmtCOP(m.total)}</td>
+                      <td className="px-4 py-3 text-right text-sm text-muted">{fmtCOP(m.promedio)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </>
           )}
         </div>
@@ -609,23 +619,23 @@ export default function Reportes() {
 
       {/* Tab productos sin movimiento */}
       {tab === 'sin-movimiento' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="card space-y-4">
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div className="flex items-end gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Días sin movimiento</label>
+                <label className="block text-xs font-medium text-muted mb-1">Días sin movimiento</label>
                 <input
                   type="number"
                   min={1}
                   value={diasSinMovimiento}
                   onChange={(e) => setDiasSinMovimiento(Math.max(1, Number(e.target.value) || 1))}
-                  className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-28 px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
             {productosSinMovimiento.length > 0 && (
               <button onClick={() => pdfSinMovimiento(productosSinMovimiento, diasSinMovimiento)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium">
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg text-sm font-medium">
                 <Download size={14} /> PDF
               </button>
             )}
@@ -634,47 +644,49 @@ export default function Reportes() {
           {cargandoSinMovimiento ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
           ) : productosSinMovimiento.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">
+            <p className="text-muted text-sm text-center py-8">
               No hay productos sin movimiento en los últimos {diasSinMovimiento} días
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Productos sin movimiento</p>
-                  <p className="text-2xl font-bold text-gray-800">{productosSinMovimiento.length}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Productos sin movimiento</p>
+                  <p className="text-2xl font-bold text-heading">{productosSinMovimiento.length}</p>
                 </div>
-                <div className="bg-yellow-50 rounded-lg p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">Valor inmovilizado</p>
-                  <p className="text-xl font-bold text-yellow-700">{fmtCOP(totalInmovilizado)}</p>
+                <div className="bg-yellow-50 dark:bg-yellow-500/10 rounded-lg p-4 text-center">
+                  <p className="text-xs text-muted mb-1">Valor inmovilizado</p>
+                  <p className="text-xl font-bold text-yellow-700 dark:text-yellow-400">{fmtCOP(totalInmovilizado)}</p>
                 </div>
               </div>
+              <div className="overflow-x-auto max-h-[60vh]">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Producto</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Categoría</th>
-                    <th className="text-center text-xs font-semibold text-gray-500 uppercase px-4 py-2">Stock</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Valor inmov.</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Último movimiento</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Producto</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Categoría</th>
+                    <th className="text-center text-xs font-semibold text-muted uppercase px-4 py-2">Stock</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Valor inmov.</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Último movimiento</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                   {productosSinMovimiento.map((p, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{p.nombre}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{p.categoria || '—'}</td>
-                      <td className="px-4 py-3 text-center text-sm">{p.stockActual}</td>
-                      <td className="px-4 py-3 text-right text-sm font-semibold text-yellow-700">{fmtCOP(p.valorInmovilizadoCop)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
+                    <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-700/40">
+                      <td className="px-4 py-3 text-sm font-medium text-heading">{p.nombre}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{p.categoria || '—'}</td>
+                      <td className="px-4 py-3 text-center text-sm text-heading">{p.stockActual}</td>
+                      <td className="px-4 py-3 text-right text-sm font-semibold text-yellow-700 dark:text-yellow-400">{fmtCOP(p.valorInmovilizadoCop)}</td>
+                      <td className="px-4 py-3 text-sm text-muted">
                         {p.ultimoMovimiento
                           ? `${formatFechaCorta(p.ultimoMovimiento)} (${p.diasSinMovimiento} días)`
-                          : <span className="text-red-600 font-medium">Nunca</span>}
+                          : <span className="text-red-600 dark:text-red-400 font-medium">Nunca</span>}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </>
           )}
         </div>
