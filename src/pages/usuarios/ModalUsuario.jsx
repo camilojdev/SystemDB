@@ -7,7 +7,7 @@ import {
   solicitarCreacionDueno,
   confirmarCreacionDueno,
 } from '../../api/usuarios'
-import { X, ShieldCheck } from 'lucide-react'
+import { X, ShieldCheck, Eye, EyeOff } from 'lucide-react'
 
 const ROLES = [
   { value: 'DUENO', label: 'Dueño' },
@@ -22,6 +22,34 @@ const PERMISOS = [
   { key: 'puedeVerReportes', label: 'Ver reportes' },
   { key: 'puedeGestionarCredito', label: 'Gestionar crédito' },
 ]
+
+function CampoContrasena({ label, value, onChange, placeholder, hint }) {
+  const [mostrar, setMostrar] = useState(false)
+  return (
+    <div>
+      <label className="block text-sm font-medium text-heading mb-1">{label}</label>
+      <div className="relative">
+        <input
+          type={mostrar ? 'text' : 'password'}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="w-full px-3 py-2 pr-10 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="button"
+          onClick={() => setMostrar((v) => !v)}
+          tabIndex={-1}
+          aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300"
+        >
+          {mostrar ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+      {hint && <p className="text-xs text-muted mt-1">{hint}</p>}
+    </div>
+  )
+}
 
 export default function ModalUsuario({ usuario, onClose, onSuccess }) {
   const esEdicion = !!usuario
@@ -150,18 +178,18 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-lg font-semibold text-gray-800">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold text-heading">
             {esEdicion ? usuario.nombreCompleto : 'Nuevo usuario'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg text-heading">
             <X size={20} />
           </button>
         </div>
 
         {esEdicion && (
-          <div className="flex border-b px-6">
+          <div className="flex border-b border-gray-200 dark:border-slate-700 px-6">
             {[
               { key: 'info', label: 'Información' },
               { key: 'permisos', label: 'Permisos' },
@@ -171,7 +199,7 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
                 key={t.key}
                 onClick={() => { setTab(t.key); setError(''); setExito('') }}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  tab === t.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  tab === t.key ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-muted hover:text-heading'
                 }`}
               >
                 {t.label}
@@ -185,16 +213,16 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
           {/* Creación de usuario — paso 2: confirmar código (solo para rol DUEÑO) */}
           {!esEdicion && pasoDueno === 'codigo' ? (
             <form onSubmit={handleConfirmarDueno} className="space-y-3">
-              <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5">
-                <ShieldCheck size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-blue-800">
+              <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded-lg px-3 py-2.5">
+                <ShieldCheck size={16} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-blue-800 dark:text-blue-300">
                   Enviamos un código de confirmación a <b>tu correo registrado</b> (no al del nuevo usuario).
                   Ingrésalo para completar la creación.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Código de 6 dígitos</label>
+                <label className="block text-sm font-medium text-heading mb-1">Código de 6 dígitos</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -202,11 +230,11 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
                   value={codigoDueno}
                   onChange={(e) => setCodigoDueno(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
 
               <button type="submit" disabled={confirmando || codigoDueno.length !== 6}
                 className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
@@ -218,7 +246,7 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
                 <button
                   type="button"
                   onClick={() => { setPasoDueno('formulario'); setCodigoDueno(''); setError('') }}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-muted hover:text-heading"
                 >
                   ← Corregir datos
                 </button>
@@ -226,7 +254,7 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
                   type="button"
                   onClick={() => solicitarDueno(datosSolicitudDueno())}
                   disabled={solicitando}
-                  className="text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 disabled:opacity-50"
                 >
                   {solicitando ? 'Enviando...' : 'Reenviar código'}
                 </button>
@@ -238,63 +266,59 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
             (!esEdicion || tab === 'info') && (
               <form onSubmit={handleCrear} className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Nombre completo</label>
                   <input type="text" value={form.nombreCompleto}
                     onChange={(e) => setForm({ ...form, nombreCompleto: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Usuario</label>
                   <input type="text" value={form.nombreUsuario}
                     onChange={(e) => setForm({ ...form, nombreUsuario: e.target.value })}
                     disabled={esEdicion}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 dark:disabled:bg-slate-800"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Correo {!esEdicion && form.rol === 'DUENO' && <span className="text-red-500">*</span>}
+                  <label className="block text-sm font-medium text-heading mb-1">
+                    Correo {!esEdicion && form.rol === 'DUENO' && <span className="text-red-500 dark:text-red-400">*</span>}
                   </label>
                   <input type="email" value={form.correo}
                     onChange={(e) => setForm({ ...form, correo: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Rol</label>
                   <select value={form.rol}
                     onChange={(e) => setForm({ ...form, rol: e.target.value })}
                     disabled={esEdicion}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 dark:disabled:bg-slate-800"
                   >
                     {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
                 </div>
                 {!esEdicion && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña inicial</label>
-                    <input type="password" value={form.contrasena}
-                      onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
-                      placeholder="Mínimo 8 caracteres"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {form.rol === 'DUENO' && (
-                      <p className="text-xs text-gray-400 mt-1">Mínimo 8 caracteres, una mayúscula y un número</p>
-                    )}
-                  </div>
+                  <CampoContrasena
+                    label="Contraseña inicial"
+                    value={form.contrasena}
+                    onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
+                    placeholder="Mínimo 8 caracteres"
+                    hint={form.rol === 'DUENO' ? 'Mínimo 8 caracteres, una mayúscula y un número' : null}
+                  />
                 )}
 
                 {!esEdicion && form.rol === 'DUENO' && (
-                  <div className="flex items-start gap-2 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2.5">
-                    <ShieldCheck size={16} className="text-purple-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-purple-800">
+                  <div className="flex items-start gap-2 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 rounded-lg px-3 py-2.5">
+                    <ShieldCheck size={16} className="text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-purple-800 dark:text-purple-300">
                       Crear un usuario con rol Dueño requiere confirmación por un código enviado a tu correo.
                     </p>
                   </div>
                 )}
 
-                {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+                {error && <p className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
 
                 {!esEdicion && (
                   <button type="submit" disabled={creando || solicitando}
@@ -313,25 +337,25 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
           {esEdicion && tab === 'permisos' && (
             <form onSubmit={handlePermisos} className="space-y-3">
               {usuario.rol !== 'CAJERA' ? (
-                <p className="text-gray-400 text-sm text-center py-4">
+                <p className="text-muted text-sm text-center py-4">
                   Los permisos granulares solo aplican al rol Cajera
                 </p>
               ) : (
                 <>
-                  <p className="text-sm text-gray-500 mb-2">Configura los permisos de {usuario.nombreCompleto}</p>
+                  <p className="text-sm text-muted mb-2">Configura los permisos de {usuario.nombreCompleto}</p>
                   {PERMISOS.map((p) => (
-                    <label key={p.key} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <label key={p.key} className="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={form[p.key]}
                         onChange={(e) => setForm({ ...form, [p.key]: e.target.checked })}
                         className="rounded"
                       />
-                      <span className="text-sm font-medium text-gray-700">{p.label}</span>
+                      <span className="text-sm font-medium text-heading">{p.label}</span>
                     </label>
                   ))}
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                  {exito && <p className="text-green-600 text-sm">{exito}</p>}
+                  {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
+                  {exito && <p className="text-green-600 dark:text-green-400 text-sm">{exito}</p>}
                   <button type="submit" disabled={actualizando}
                     className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
                   >
@@ -345,24 +369,20 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
           {/* Tab contraseña */}
           {esEdicion && tab === 'contrasena' && (
             <form onSubmit={handleContrasena} className="space-y-3">
-              <p className="text-sm text-gray-500">Cambiar contraseña de {usuario.nombreCompleto}</p>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña actual</label>
-                <input type="password" value={contrasenaForm.contrasenaActual}
-                  onChange={(e) => setContrasenaForm({ ...contrasenaForm, contrasenaActual: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña nueva</label>
-                <input type="password" value={contrasenaForm.contrasenaNueva}
-                  onChange={(e) => setContrasenaForm({ ...contrasenaForm, contrasenaNueva: e.target.value })}
-                  placeholder="Mínimo 8 caracteres"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              {exito && <p className="text-green-600 text-sm">{exito}</p>}
+              <p className="text-sm text-muted">Cambiar contraseña de {usuario.nombreCompleto}</p>
+              <CampoContrasena
+                label="Contraseña actual"
+                value={contrasenaForm.contrasenaActual}
+                onChange={(e) => setContrasenaForm({ ...contrasenaForm, contrasenaActual: e.target.value })}
+              />
+              <CampoContrasena
+                label="Contraseña nueva"
+                value={contrasenaForm.contrasenaNueva}
+                onChange={(e) => setContrasenaForm({ ...contrasenaForm, contrasenaNueva: e.target.value })}
+                placeholder="Mínimo 8 caracteres"
+              />
+              {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
+              {exito && <p className="text-green-600 dark:text-green-400 text-sm">{exito}</p>}
               <button type="submit" disabled={cambiando}
                 className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
               >
