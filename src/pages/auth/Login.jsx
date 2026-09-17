@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
+import { Eye, EyeOff } from 'lucide-react'
 import { login } from '../../api/auth'
 import useAuthStore from '../../store/authStore'
 import { NOMBRE_NEGOCIO } from '../../utils/marca'
@@ -12,6 +13,7 @@ export default function Login() {
 
   const [form, setForm] = useState({ nombreUsuario: '', contrasena: '' })
   const [error, setError] = useState('')
+  const [mostrarContrasena, setMostrarContrasena] = useState(false)
 
   // Si ya está autenticado redirigir
   if (token) {
@@ -77,15 +79,26 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-300 mb-1.5">
                 Contraseña
               </label>
-              <input
-                type="password"
-                value={form.contrasena}
-                onChange={(e) =>
-                  setForm({ ...form, contrasena: e.target.value })
-                }
-                placeholder="••••••••"
-                className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              />
+              <div className="relative">
+                <input
+                  type={mostrarContrasena ? 'text' : 'password'}
+                  value={form.contrasena}
+                  onChange={(e) =>
+                    setForm({ ...form, contrasena: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2.5 pr-11 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setMostrarContrasena((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  {mostrarContrasena ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div className="text-right">
               <button
