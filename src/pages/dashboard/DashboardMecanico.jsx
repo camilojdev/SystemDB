@@ -5,15 +5,15 @@ import { Wrench, CheckCircle, Clock, TrendingUp, AlertTriangle } from 'lucide-re
 
 function Tarjeta({ titulo, valor, subtitulo, icono: Icon, color }) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+    <div className="card">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-gray-500">{titulo}</span>
+        <span className="text-base font-medium text-muted">{titulo}</span>
         <div className={`p-2 rounded-lg ${color}`}>
           <Icon size={20} className="text-white" />
         </div>
       </div>
-      <p className="text-2xl font-bold text-gray-800">{valor}</p>
-      {subtitulo && <p className="text-sm text-gray-500 mt-1">{subtitulo}</p>}
+      <p className="text-3xl font-bold text-heading">{valor}</p>
+      {subtitulo && <p className="text-sm text-muted mt-1">{subtitulo}</p>}
     </div>
   )
 }
@@ -35,7 +35,7 @@ export default function DashboardMecanico() {
     <div className="flex items-center justify-center h-full">
       <div className="text-center">
         <AlertTriangle size={48} className="text-red-400 mx-auto mb-3" />
-        <p className="text-gray-600">Error al cargar el dashboard</p>
+        <p className="text-heading">Error al cargar el dashboard</p>
       </div>
     </div>
   )
@@ -43,10 +43,10 @@ export default function DashboardMecanico() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="text-3xl font-bold text-heading">
           Bienvenido, {data.nombreMecanico}
         </h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-muted text-base mt-1">
           {new Date().toLocaleDateString('es-CO', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
           })}
@@ -54,7 +54,7 @@ export default function DashboardMecanico() {
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-3">
           Estado actual
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -90,17 +90,17 @@ export default function DashboardMecanico() {
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-3">
           Resumen del mes
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">OTs completadas este mes</p>
-            <p className="text-3xl font-bold text-gray-800">{data.otsTotalesDelMes}</p>
+          <div className="card">
+            <p className="text-base text-muted mb-1">OTs completadas este mes</p>
+            <p className="text-3xl font-bold text-heading">{data.otsTotalesDelMes}</p>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Total facturado este mes</p>
-            <p className="text-3xl font-bold text-green-600">
+          <div className="card">
+            <p className="text-base text-muted mb-1">Total facturado este mes</p>
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400">
               {formatCOP(data.totalFacturadoMesCop)}
             </p>
           </div>

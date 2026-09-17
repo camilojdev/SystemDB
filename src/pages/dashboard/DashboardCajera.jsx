@@ -27,8 +27,8 @@ export default function DashboardCajera() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-3xl font-bold text-heading">Dashboard</h1>
+        <p className="text-muted text-base mt-1">
           {new Date().toLocaleDateString('es-CO', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
           })}
@@ -36,76 +36,76 @@ export default function DashboardCajera() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div className="card !p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-gray-500">Ventas hoy</p>
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <ShoppingCart size={16} className="text-blue-600" />
+            <p className="text-base text-muted">Ventas hoy</p>
+            <div className="bg-blue-100 dark:bg-blue-500/20 p-2 rounded-lg">
+              <ShoppingCart size={16} className="text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-800">{ventas.length}</p>
-          <p className="text-xs text-gray-400 mt-1">transacciones</p>
+          <p className="text-3xl font-bold text-heading">{ventas.length}</p>
+          <p className="text-sm text-muted mt-1">transacciones</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div className="card !p-5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-gray-500">Ingresos hoy</p>
-            <div className="bg-green-100 p-2 rounded-lg">
-              <TrendingUp size={16} className="text-green-600" />
+            <p className="text-base text-muted">Ingresos hoy</p>
+            <div className="bg-green-100 dark:bg-green-500/20 p-2 rounded-lg">
+              <TrendingUp size={16} className="text-green-600 dark:text-green-400" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-green-600">{formatCOP(totalVentas)}</p>
-          <p className="text-xs text-gray-400 mt-1">ventas completadas</p>
+          <p className="text-3xl font-bold text-green-600 dark:text-green-400">{formatCOP(totalVentas)}</p>
+          <p className="text-sm text-muted mt-1">ventas completadas</p>
         </div>
 
         {cajaAbierta && cajaData && (
           <>
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <div className="card !p-5">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-500">Efectivo en caja</p>
-                <div className="bg-yellow-100 p-2 rounded-lg">
-                  <DollarSign size={16} className="text-yellow-600" />
+                <p className="text-base text-muted">Efectivo en caja</p>
+                <div className="bg-yellow-100 dark:bg-yellow-500/20 p-2 rounded-lg">
+                  <DollarSign size={16} className="text-yellow-600 dark:text-yellow-400" />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{formatCOP(cajaData.totalEfectivoCop)}</p>
-              <p className="text-xs text-gray-400 mt-1">del turno actual</p>
+              <p className="text-3xl font-bold text-heading">{formatCOP(cajaData.totalEfectivoCop)}</p>
+              <p className="text-sm text-muted mt-1">del turno actual</p>
             </div>
 
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+            <div className="card !p-5">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-500">Saldo esperado</p>
-                <div className="bg-purple-100 p-2 rounded-lg">
-                  <DollarSign size={16} className="text-purple-600" />
+                <p className="text-base text-muted">Saldo esperado</p>
+                <div className="bg-purple-100 dark:bg-purple-500/20 p-2 rounded-lg">
+                  <DollarSign size={16} className="text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-blue-600">{formatCOP(cajaData.saldoEsperadoCop)}</p>
-              <p className="text-xs text-gray-400 mt-1">en caja</p>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{formatCOP(cajaData.saldoEsperadoCop)}</p>
+              <p className="text-sm text-muted mt-1">en caja</p>
             </div>
           </>
         )}
       </div>
 
       {!cajaAbierta && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700">
+        <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-4 text-base text-yellow-700 dark:text-yellow-300">
           ⚠️ No hay caja abierta. Ve a <strong>Caja</strong> para iniciar el turno.
         </div>
       )}
 
       {cajaAbierta && cajaData && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-700 mb-3">Resumen del turno</h2>
-          <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="card">
+          <h2 className="text-lg font-semibold text-heading mb-3">Resumen del turno</h2>
+          <div className="grid grid-cols-3 gap-4 text-base">
             <div>
-              <p className="text-gray-400 mb-1">Gastos</p>
-              <p className="font-semibold text-red-600">{formatCOP(cajaData.totalGastosCop)}</p>
+              <p className="text-muted mb-1">Gastos</p>
+              <p className="font-semibold text-red-600 dark:text-red-400">{formatCOP(cajaData.totalGastosCop)}</p>
             </div>
             <div>
-              <p className="text-gray-400 mb-1">Transferencias</p>
-              <p className="font-semibold text-gray-800">{formatCOP(cajaData.totalTransferenciaCop)}</p>
+              <p className="text-muted mb-1">Transferencias</p>
+              <p className="font-semibold text-heading">{formatCOP(cajaData.totalTransferenciaCop)}</p>
             </div>
             <div>
-              <p className="text-gray-400 mb-1">Crédito</p>
-              <p className="font-semibold text-gray-800">{formatCOP(cajaData.totalCreditoCop)}</p>
+              <p className="text-muted mb-1">Crédito</p>
+              <p className="font-semibold text-heading">{formatCOP(cajaData.totalCreditoCop)}</p>
             </div>
           </div>
         </div>

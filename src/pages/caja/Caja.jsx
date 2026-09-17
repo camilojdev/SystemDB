@@ -136,32 +136,32 @@ function FilaMovimiento({ mov }) {
 
   return (
     <>
-      <div className={`flex items-center justify-between py-2 border-b border-gray-50 last:border-0 ${esAnulacion ? 'bg-red-50' : ''}`}>
+      <div className={`flex items-center justify-between py-2 border-b border-gray-50 dark:border-slate-700 last:border-0 ${esAnulacion ? 'bg-red-50 dark:bg-red-500/10' : ''}`}>
         <div className="flex items-center gap-3">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center ${esAnulacion ? 'bg-red-200' : esIngreso ? 'bg-green-100' : 'bg-red-100'}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center ${esAnulacion ? 'bg-red-200 dark:bg-red-500/30' : esIngreso ? 'bg-green-100 dark:bg-green-500/20' : 'bg-red-100 dark:bg-red-500/20'}`}>
             {esIngreso && !esAnulacion
-              ? <TrendingUp size={13} className="text-green-600" />
-              : <TrendingDown size={13} className="text-red-600" />}
+              ? <TrendingUp size={13} className="text-green-600 dark:text-green-400" />
+              : <TrendingDown size={13} className="text-red-600 dark:text-red-400" />}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <p className={`text-sm font-medium ${esAnulacion ? 'text-red-700' : 'text-gray-700'}`}>
+              <p className={`text-base font-medium ${esAnulacion ? 'text-red-700 dark:text-red-400' : 'text-heading'}`}>
                 {mov.descripcion}
               </p>
               {esVenta && !esAnulacion && (
                 <button onClick={() => setVerVenta(true)}
-                  className="text-xs text-blue-500 hover:text-blue-700 underline">
+                  className="text-sm text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline">
                   Ver detalle
                 </button>
               )}
             </div>
             <div className="flex items-center gap-2">
-              {mov.registradoPor && <p className="text-xs text-blue-500">{mov.registradoPor}</p>}
-              <p className="text-xs text-gray-400">{formatFecha(mov.creadoEn)}</p>
+              {mov.registradoPor && <p className="text-sm text-blue-500 dark:text-blue-400">{mov.registradoPor}</p>}
+              <p className="text-sm text-muted">{formatFecha(mov.creadoEn)}</p>
             </div>
           </div>
         </div>
-        <span className={`text-sm font-semibold ${esAnulacion ? 'text-red-700' : esIngreso ? 'text-green-600' : 'text-red-600'}`}>
+        <span className={`text-base font-semibold ${esAnulacion ? 'text-red-700 dark:text-red-400' : esIngreso ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {esIngreso && !esAnulacion ? '+' : '-'}{formatCOP(mov.montoCop)}
         </span>
       </div>
@@ -319,21 +319,22 @@ export default function Caja() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Caja</h1>
-          <p className="text-gray-500 text-sm mt-1">Gestión de sesiones de caja</p>
+          <h1 className="text-3xl font-bold text-heading">Caja</h1>
+          <p className="text-muted text-base mt-1">Gestión de sesiones de caja</p>
         </div>
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${cajaAbierta ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${cajaAbierta ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'}`}>
           {cajaAbierta ? <Unlock size={14} /> : <Lock size={14} />}
           {cajaAbierta ? 'Mi caja abierta' : 'Mi caja cerrada'}
         </div>
       </div>
+
       {esDueno && (
         <button
           onClick={() => setTabHistorial(!tabHistorial)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tabHistorial
               ? 'bg-blue-600 text-white'
-              : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+              : 'border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
           }`}
         >
           <BarChart3 size={15} />
@@ -343,33 +344,33 @@ export default function Caja() {
 
       {/* Vista general dueño — sesiones abiertas */}
       {esDueno && sesionesAbiertas.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <Users size={16} className="text-blue-500" />
-            <h2 className="font-semibold text-gray-700">Cajas activas del negocio</h2>
-            <span className="ml-auto bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full">
+            <Users size={16} className="text-blue-500 dark:text-blue-400" />
+            <h2 className="text-lg font-semibold text-heading">Cajas activas del negocio</h2>
+            <span className="ml-auto bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-sm font-medium px-2.5 py-0.5 rounded-full">
               {sesionesAbiertas.length} abiertas
             </span>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {sesionesAbiertas.map((s) => (
-              <div key={s.id} className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div key={s.id} className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="font-medium text-gray-800">{s.cajera}</p>
-                  <span className="text-xs text-gray-400">Desde {formatFecha(s.abiertaEn)}</span>
+                  <p className="font-medium text-heading">{s.cajera}</p>
+                  <span className="text-sm text-muted">Desde {formatFecha(s.abiertaEn)}</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-3 gap-2 text-sm">
                   <div>
-                    <p className="text-gray-400">Ventas</p>
-                    <p className="font-semibold text-green-600">{formatCOP(s.totalVentasCop)}</p>
+                    <p className="text-muted">Ventas</p>
+                    <p className="font-semibold text-green-600 dark:text-green-400">{formatCOP(s.totalVentasCop)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400">Gastos</p>
-                    <p className="font-semibold text-red-600">{formatCOP(s.totalGastosCop)}</p>
+                    <p className="text-muted">Gastos</p>
+                    <p className="font-semibold text-red-600 dark:text-red-400">{formatCOP(s.totalGastosCop)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400">Saldo esperado</p>
-                    <p className="font-semibold text-blue-600">{formatCOP(s.saldoEsperadoCop)}</p>
+                    <p className="text-muted">Saldo esperado</p>
+                    <p className="font-semibold text-blue-600 dark:text-blue-400">{formatCOP(s.saldoEsperadoCop)}</p>
                   </div>
                 </div>
               </div>
@@ -380,16 +381,16 @@ export default function Caja() {
 
       {/* Abrir caja — solo dueño */}
       {esDueno && !isLoading && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-md">
-          <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <Unlock size={16} className="text-green-600" />
+        <div className="card max-w-md">
+          <h2 className="text-lg font-semibold text-heading mb-4 flex items-center gap-2">
+            <Unlock size={16} className="text-green-600 dark:text-green-400" />
             Abrir sesión de caja
           </h2>
           <form onSubmit={handleAbrir} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Abrir para</label>
+              <label className="block text-sm font-medium text-heading mb-1">Abrir para</label>
               <select value={cajeraId} onChange={(e) => setCajeraId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Mi propia caja</option>
                 {cajeras.filter(c => c.rol !== 'DUENO').map((c) => (
                   <option key={c.id} value={c.id}>{c.nombreCompleto}</option>
@@ -397,12 +398,12 @@ export default function Caja() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Saldo inicial (COP)</label>
+              <label className="block text-sm font-medium text-heading mb-1">Saldo inicial (COP)</label>
               <input type="number" placeholder="Ej: 200000" value={saldoApertura}
                 onChange={(e) => setSaldoApertura(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
-            {error && tab !== 'cierre' && tab !== 'gasto' && <p className="text-red-500 text-sm">{error}</p>}
+            {error && tab !== 'cierre' && tab !== 'gasto' && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
             <button type="submit" disabled={abriendo}
               className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
               {abriendo ? 'Abriendo...' : 'Abrir caja'}
@@ -416,42 +417,42 @@ export default function Caja() {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Saldo inicial', valor: sesion.saldoInicialCop, color: 'text-gray-800' },
-              { label: 'Total ventas', valor: sesion.totalVentasCop, color: 'text-green-600' },
-              { label: 'Gastos', valor: sesion.totalGastosCop, color: 'text-red-600' },
-              { label: 'Saldo esperado', valor: sesion.saldoEsperadoCop, color: 'text-blue-600' },
+              { label: 'Saldo inicial', valor: sesion.saldoInicialCop, color: 'text-heading' },
+              { label: 'Total ventas', valor: sesion.totalVentasCop, color: 'text-green-600 dark:text-green-400' },
+              { label: 'Gastos', valor: sesion.totalGastosCop, color: 'text-red-600 dark:text-red-400' },
+              { label: 'Saldo esperado', valor: sesion.saldoEsperadoCop, color: 'text-blue-600 dark:text-blue-400' },
             ].map((m) => (
-              <div key={m.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">{m.label}</p>
-                <p className={`text-xl font-bold ${m.color}`}>{formatCOP(m.valor)}</p>
+              <div key={m.label} className="card !p-4">
+                <p className="text-sm text-muted mb-1">{m.label}</p>
+                <p className={`text-2xl font-bold ${m.color}`}>{formatCOP(m.valor)}</p>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <p className="text-xs text-gray-500 mb-1">💵 Efectivo</p>
-              <p className="text-lg font-bold text-gray-800">{formatCOP(sesion.totalEfectivoCop)}</p>
+            <div className="card !p-4">
+              <p className="text-sm text-muted mb-1">💵 Efectivo</p>
+              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalEfectivoCop)}</p>
             </div>
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <p className="text-xs text-gray-500 mb-1">🏦 Transferencia</p>
-              <p className="text-lg font-bold text-gray-800">{formatCOP(sesion.totalTransferenciaCop)}</p>
+            <div className="card !p-4">
+              <p className="text-sm text-muted mb-1">🏦 Transferencia</p>
+              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalTransferenciaCop)}</p>
             </div>
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              <p className="text-xs text-gray-500 mb-1">📋 Crédito</p>
-              <p className="text-lg font-bold text-gray-800">{formatCOP(sesion.totalCreditoCop)}</p>
+            <div className="card !p-4">
+              <p className="text-sm text-muted mb-1">📋 Crédito</p>
+              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalCreditoCop)}</p>
             </div>
           </div>
 
-          <div className="flex gap-2 border-b border-gray-200">
+          <div className="flex gap-2 border-b border-gray-200 dark:border-slate-700">
             {[
               { key: 'sesion', label: 'Movimientos' },
               { key: 'gasto', label: 'Registrar gasto' },
               ...(esDueno ? [{ key: 'cierre', label: 'Cerrar caja' }] : []),
             ].map((t) => (
               <button key={t.key} onClick={() => { setTab(t.key); setError('') }}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-                  tab === t.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                className={`px-4 py-2.5 text-base font-medium border-b-2 transition-colors ${
+                  tab === t.key ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-muted hover:text-heading'
                 }`}>
                 {t.label}
               </button>
@@ -459,14 +460,14 @@ export default function Caja() {
           </div>
 
           {tab === 'sesion' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <DollarSign size={16} className="text-gray-500" />
-                <h3 className="font-semibold text-gray-700">Movimientos — {sesion.cajera}</h3>
-                <span className="text-xs text-gray-400 ml-auto">Desde {formatFecha(sesion.abiertaEn)}</span>
+                <DollarSign size={16} className="text-muted" />
+                <h3 className="text-lg font-semibold text-heading">Movimientos — {sesion.cajera}</h3>
+                <span className="text-sm text-muted ml-auto">Desde {formatFecha(sesion.abiertaEn)}</span>
               </div>
               {sesion.movimientos?.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-6">Sin movimientos aún</p>
+                <p className="text-muted text-base text-center py-6">Sin movimientos aún</p>
               ) : (
                 <div className="space-y-1">
                   {sesion.movimientos?.map((m) => (
@@ -478,22 +479,22 @@ export default function Caja() {
           )}
 
           {tab === 'gasto' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-md">
-              <h3 className="font-semibold text-gray-700 mb-4">Registrar gasto operativo</h3>
+            <div className="card max-w-md">
+              <h3 className="text-lg font-semibold text-heading mb-4">Registrar gasto operativo</h3>
               <form onSubmit={handleGasto} className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Descripción</label>
                   <input type="text" placeholder="Ej: Papelería, servicios..."
                     value={descGasto} onChange={(e) => setDescGasto(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Monto (COP)</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Monto (COP)</label>
                   <input type="number" placeholder="Ej: 15000"
                     value={montoGasto} onChange={(e) => setMontoGasto(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+                {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
                 <button type="submit" disabled={guardandoGasto}
                   className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium disabled:opacity-50">
                   {guardandoGasto ? 'Registrando...' : 'Registrar gasto'}
@@ -503,17 +504,17 @@ export default function Caja() {
           )}
 
           {tab === 'cierre' && esDueno && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-md">
-              <h3 className="font-semibold text-gray-700 mb-1 flex items-center gap-2">
+            <div className="card max-w-md">
+              <h3 className="text-lg font-semibold text-heading mb-1 flex items-center gap-2">
                 <AlertTriangle size={16} className="text-orange-500" />
                 Cerrar sesión de caja
               </h3>
               <form onSubmit={handleCerrar} className="space-y-3 mt-4">
                 {sesionesAbiertas.length > 1 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sesión a cerrar</label>
+                    <label className="block text-sm font-medium text-heading mb-1">Sesión a cerrar</label>
                     <select value={sesionCierreId} onChange={(e) => setSesionCierreId(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <option value="">Seleccionar cajera</option>
                       {sesionesAbiertas.map((s) => (
                         <option key={s.id} value={s.id}>
@@ -524,19 +525,19 @@ export default function Caja() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Efectivo contado (COP)</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Efectivo contado (COP)</label>
                   <input type="number" placeholder="Ingresa el dinero contado en caja"
                     value={saldoCierre} onChange={(e) => setSaldoCierre(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notas de cierre (opcional)</label>
+                  <label className="block text-sm font-medium text-heading mb-1">Notas de cierre (opcional)</label>
                   <textarea placeholder="Observaciones del turno..."
                     value={notasCierre} onChange={(e) => setNotasCierre(e.target.value)}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                 </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+                {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
                 <button type="submit" disabled={cerrando}
                   className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
                   {cerrando ? 'Cerrando...' : 'Cerrar caja'}
@@ -558,23 +559,24 @@ export default function Caja() {
 
       {/* Cajera sin caja abierta */}
       {!esDueno && !cajaAbierta && !isLoading && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+        <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-6 text-center">
           <Lock size={32} className="text-yellow-500 mx-auto mb-3" />
-          <p className="font-medium text-gray-700 mb-1">Tu caja está cerrada</p>
-          <p className="text-sm text-gray-500">El administrador debe abrir tu sesión de caja.</p>
+          <p className="font-medium text-heading mb-1">Tu caja está cerrada</p>
+          <p className="text-base text-muted">El administrador debe abrir tu sesión de caja.</p>
         </div>
       )}
+
       {esDueno && tabHistorial && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
-          <h2 className="font-semibold text-gray-700">Historial de cajas cerradas</h2>
+        <div className="card space-y-4">
+          <h2 className="text-lg font-semibold text-heading">Historial de cajas cerradas</h2>
 
           {/* Filtros */}
           <div className="flex items-end gap-3 flex-wrap">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Cajera</label>
+              <label className="block text-sm font-medium text-muted mb-1">Cajera</label>
               <select value={filtroCajeraId}
                 onChange={(e) => { setFiltroCajeraId(e.target.value); setPaginaHistorial(0) }}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                className="px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Todas</option>
                 {cajeras.map((c) => (
                   <option key={c.id} value={c.id}>{c.nombreCompleto}</option>
@@ -582,19 +584,19 @@ export default function Caja() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Desde</label>
+              <label className="block text-sm font-medium text-muted mb-1">Desde</label>
               <input type="date" value={filtroDesde}
                 onChange={(e) => { setFiltroDesde(e.target.value); setPaginaHistorial(0) }}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Hasta</label>
+              <label className="block text-sm font-medium text-muted mb-1">Hasta</label>
               <input type="date" value={filtroHasta}
                 onChange={(e) => { setFiltroHasta(e.target.value); setPaginaHistorial(0) }}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <button onClick={() => { setFiltroCajeraId(''); setFiltroDesde(''); setFiltroHasta(''); setPaginaHistorial(0) }}
-              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+              className="px-3 py-2 text-sm text-muted hover:text-heading border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
               Limpiar
             </button>
           </div>
@@ -605,42 +607,43 @@ export default function Caja() {
               <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : historial.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">No hay cajas cerradas</p>
+            <p className="text-muted text-base text-center py-8">No hay cajas cerradas</p>
           ) : (
             <>
+              <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-slate-700/50">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Cajera</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Apertura</th>
-                    <th className="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-2">Cierre</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Ventas</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Gastos</th>
-                    <th className="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-2">Diferencia</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Cajera</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Apertura</th>
+                    <th className="text-left text-xs font-semibold text-muted uppercase px-4 py-2">Cierre</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Ventas</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Gastos</th>
+                    <th className="text-right text-xs font-semibold text-muted uppercase px-4 py-2">Diferencia</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                   {historial.map((s) => (
-                    <tr key={s.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{s.cajera}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{formatFecha(s.abiertaEn)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{formatFecha(s.cerradaEn)}</td>
-                      <td className="px-4 py-3 text-right text-sm text-green-600 font-medium">{formatCOP(s.totalVentasCop)}</td>
-                      <td className="px-4 py-3 text-right text-sm text-red-600">{formatCOP(s.totalGastosCop)}</td>
+                    <tr key={s.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                      <td className="px-4 py-3 text-sm font-medium text-heading">{s.cajera}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{formatFecha(s.abiertaEn)}</td>
+                      <td className="px-4 py-3 text-sm text-muted">{formatFecha(s.cerradaEn)}</td>
+                      <td className="px-4 py-3 text-right text-sm text-green-600 dark:text-green-400 font-medium">{formatCOP(s.totalVentasCop)}</td>
+                      <td className="px-4 py-3 text-right text-sm text-red-600 dark:text-red-400">{formatCOP(s.totalGastosCop)}</td>
                       <td className={`px-4 py-3 text-right text-sm font-semibold ${
-                        s.diferenciaCop >= 0 ? 'text-green-600' : 'text-red-600'
+                        s.diferenciaCop >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                       }`}>
                         {s.diferenciaCop >= 0 ? '+' : ''}{formatCOP(s.diferenciaCop)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <button onClick={() => generarCierrePDF(s)}
-                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+                            className="p-1.5 text-muted hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg"
                             title="Descargar PDF">
                             <Download size={15} />
                           </button>
                           <button onClick={() => setSesionDetalle(s.id)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                            className="p-1.5 text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg"
                             title="Ver detalle">
                             <Eye size={15} />
                           </button>
@@ -650,20 +653,21 @@ export default function Caja() {
                   ))}
                 </tbody>
               </table>
+              </div>
 
               {totalPaginasHistorial > 1 && (
                 <div className="flex items-center justify-center gap-2 pt-2">
                   <button onClick={() => setPaginaHistorial((p) => Math.max(0, p - 1))}
                     disabled={paginaHistorial === 0}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 text-heading rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
                     Anterior
                   </button>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted">
                     Página {paginaHistorial + 1} de {totalPaginasHistorial}
                   </span>
                   <button onClick={() => setPaginaHistorial((p) => Math.min(totalPaginasHistorial - 1, p + 1))}
                     disabled={paginaHistorial >= totalPaginasHistorial - 1}
-                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+                    className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 text-heading rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
                     Siguiente
                   </button>
                 </div>
