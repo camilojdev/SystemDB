@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   token: localStorage.getItem('token') || null,
   usuario: JSON.parse(localStorage.getItem('usuario') || 'null'),
 
@@ -8,6 +8,13 @@ const useAuthStore = create((set) => ({
     localStorage.setItem('token', token)
     localStorage.setItem('usuario', JSON.stringify(usuario))
     set({ token, usuario })
+  },
+
+  actualizarUsuario: (cambios) => {
+    const actual = get().usuario || {}
+    const actualizado = { ...actual, ...cambios }
+    localStorage.setItem('usuario', JSON.stringify(actualizado))
+    set({ usuario: actualizado })
   },
 
   logout: () => {
