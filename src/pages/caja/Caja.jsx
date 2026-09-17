@@ -136,32 +136,30 @@ function FilaMovimiento({ mov }) {
 
   return (
     <>
-      <div className={`flex items-center justify-between py-2 border-b border-gray-50 dark:border-slate-700 last:border-0 ${esAnulacion ? 'bg-red-50 dark:bg-red-500/10' : ''}`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center ${esAnulacion ? 'bg-red-200 dark:bg-red-500/30' : esIngreso ? 'bg-green-100 dark:bg-green-500/20' : 'bg-red-100 dark:bg-red-500/20'}`}>
+      <div className={`flex items-start justify-between gap-3 py-2.5 border-b border-gray-50 dark:border-slate-700 last:border-0 ${esAnulacion ? 'bg-red-50 dark:bg-red-500/10' : ''}`}>
+        <div className="flex items-start gap-3 min-w-0">
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${esAnulacion ? 'bg-red-200 dark:bg-red-500/30' : esIngreso ? 'bg-green-100 dark:bg-green-500/20' : 'bg-red-100 dark:bg-red-500/20'}`}>
             {esIngreso && !esAnulacion
               ? <TrendingUp size={13} className="text-green-600 dark:text-green-400" />
               : <TrendingDown size={13} className="text-red-600 dark:text-red-400" />}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className={`text-base font-medium ${esAnulacion ? 'text-red-700 dark:text-red-400' : 'text-heading'}`}>
-                {mov.descripcion}
-              </p>
-              {esVenta && !esAnulacion && (
-                <button onClick={() => setVerVenta(true)}
-                  className="text-sm text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline">
-                  Ver detalle
-                </button>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <p className={`text-base font-medium break-words ${esAnulacion ? 'text-red-700 dark:text-red-400' : 'text-heading'}`}>
+              {mov.descripcion}
+            </p>
+            {esVenta && !esAnulacion && (
+              <button onClick={() => setVerVenta(true)}
+                className="text-sm text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline">
+                Ver detalle
+              </button>
+            )}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
               {mov.registradoPor && <p className="text-sm text-blue-500 dark:text-blue-400">{mov.registradoPor}</p>}
               <p className="text-sm text-muted">{formatFecha(mov.creadoEn)}</p>
             </div>
           </div>
         </div>
-        <span className={`text-base font-semibold ${esAnulacion ? 'text-red-700 dark:text-red-400' : esIngreso ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <span className={`text-base font-semibold flex-shrink-0 whitespace-nowrap ${esAnulacion ? 'text-red-700 dark:text-red-400' : esIngreso ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {esIngreso && !esAnulacion ? '+' : '-'}{formatCOP(mov.montoCop)}
         </span>
       </div>
@@ -316,13 +314,13 @@ export default function Caja() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-heading">Caja</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-heading">Caja</h1>
           <p className="text-muted text-base mt-1">Gestión de sesiones de caja</p>
         </div>
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${cajaAbierta ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'}`}>
+        <div className={`inline-flex self-start sm:self-auto items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${cajaAbierta ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300'}`}>
           {cajaAbierta ? <Unlock size={14} /> : <Lock size={14} />}
           {cajaAbierta ? 'Mi caja abierta' : 'Mi caja cerrada'}
         </div>
@@ -415,43 +413,43 @@ export default function Caja() {
       {/* Mi sesión actual */}
       {cajaAbierta && sesion && (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
               { label: 'Saldo inicial', valor: sesion.saldoInicialCop, color: 'text-heading' },
               { label: 'Total ventas', valor: sesion.totalVentasCop, color: 'text-green-600 dark:text-green-400' },
               { label: 'Gastos', valor: sesion.totalGastosCop, color: 'text-red-600 dark:text-red-400' },
               { label: 'Saldo esperado', valor: sesion.saldoEsperadoCop, color: 'text-blue-600 dark:text-blue-400' },
             ].map((m) => (
-              <div key={m.label} className="card !p-4">
+              <div key={m.label} className="card !p-3 sm:!p-4">
                 <p className="text-sm text-muted mb-1">{m.label}</p>
-                <p className={`text-2xl font-bold ${m.color}`}>{formatCOP(m.valor)}</p>
+                <p className={`text-lg sm:text-2xl font-bold ${m.color}`}>{formatCOP(m.valor)}</p>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="card !p-4">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <div className="card !p-3 sm:!p-4">
               <p className="text-sm text-muted mb-1">💵 Efectivo</p>
-              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalEfectivoCop)}</p>
+              <p className="text-base sm:text-xl font-bold text-heading">{formatCOP(sesion.totalEfectivoCop)}</p>
             </div>
-            <div className="card !p-4">
+            <div className="card !p-3 sm:!p-4">
               <p className="text-sm text-muted mb-1">🏦 Transferencia</p>
-              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalTransferenciaCop)}</p>
+              <p className="text-base sm:text-xl font-bold text-heading">{formatCOP(sesion.totalTransferenciaCop)}</p>
             </div>
-            <div className="card !p-4">
+            <div className="card !p-3 sm:!p-4">
               <p className="text-sm text-muted mb-1">📋 Crédito</p>
-              <p className="text-xl font-bold text-heading">{formatCOP(sesion.totalCreditoCop)}</p>
+              <p className="text-base sm:text-xl font-bold text-heading">{formatCOP(sesion.totalCreditoCop)}</p>
             </div>
           </div>
 
-          <div className="flex gap-2 border-b border-gray-200 dark:border-slate-700">
+          <div className="flex gap-1 border-b border-gray-200 dark:border-slate-700 overflow-x-auto">
             {[
               { key: 'sesion', label: 'Movimientos' },
               { key: 'gasto', label: 'Registrar gasto' },
               ...(esDueno ? [{ key: 'cierre', label: 'Cerrar caja' }] : []),
             ].map((t) => (
               <button key={t.key} onClick={() => { setTab(t.key); setError('') }}
-                className={`px-4 py-2.5 text-base font-medium border-b-2 transition-colors ${
+                className={`px-3 sm:px-4 py-2.5 text-sm sm:text-base font-medium border-b-2 whitespace-nowrap transition-colors ${
                   tab === t.key ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-muted hover:text-heading'
                 }`}>
                 {t.label}
@@ -461,10 +459,12 @@ export default function Caja() {
 
           {tab === 'sesion' && (
             <div className="card">
-              <div className="flex items-center gap-2 mb-4">
-                <DollarSign size={16} className="text-muted" />
-                <h3 className="text-lg font-semibold text-heading">Movimientos — {sesion.cajera}</h3>
-                <span className="text-sm text-muted ml-auto">Desde {formatFecha(sesion.abiertaEn)}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-4">
+                <div className="flex items-center gap-2 min-w-0">
+                  <DollarSign size={16} className="text-muted flex-shrink-0" />
+                  <h3 className="text-lg font-semibold text-heading truncate">Movimientos — {sesion.cajera}</h3>
+                </div>
+                <span className="text-sm text-muted sm:ml-auto">Desde {formatFecha(sesion.abiertaEn)}</span>
               </div>
               {sesion.movimientos?.length === 0 ? (
                 <p className="text-muted text-base text-center py-6">Sin movimientos aún</p>

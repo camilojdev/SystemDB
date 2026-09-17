@@ -305,12 +305,12 @@ export default function Pos() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col lg:flex-row lg:h-screen">
       {/* Columna izquierda */}
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="w-full lg:flex-1 p-4 sm:p-6 lg:overflow-y-auto">
         <div className="flex items-center justify-between mb-4 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-heading">Punto de Venta</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-heading">Punto de Venta</h1>
             <p className="text-muted text-sm mt-0.5">
               {new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
@@ -379,8 +379,8 @@ export default function Pos() {
       </div>
 
       {/* Columna derecha: carrito */}
-      <div className="w-96 bg-white dark:bg-slate-800 border-l border-gray-200 dark:border-slate-700 flex flex-col">
-        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+      <div className="w-full lg:w-96 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-slate-700 flex flex-col lg:h-screen lg:overflow-hidden">
+        <div className="p-4 border-t border-gray-200 dark:border-slate-700 space-y-3 lg:overflow-y-auto">
           <div className="flex items-center gap-2">
             <ShoppingCart size={18} className="text-muted" />
             <h2 className="font-semibold text-heading text-lg">Carrito</h2>
@@ -395,7 +395,7 @@ export default function Pos() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-2 max-h-80 lg:max-h-none">
           {carrito.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingCart size={32} className="text-gray-300 dark:text-slate-600 mx-auto mb-2" />
@@ -436,7 +436,7 @@ export default function Pos() {
           )}
         </div>
 
-        <div className="p-4 border-t border-gray-200 dark:border-slate-700 space-y-3">
+        <div className="p-4 border-t border-gray-200 dark:border-slate-700 space-y-3 overflow-y-auto">
           {/* Búsqueda cliente */}
           <div>
             <label className="block text-xs font-medium text-muted mb-1">
