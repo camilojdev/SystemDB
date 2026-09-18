@@ -205,24 +205,24 @@ export default function ModalCredito({ cliente, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
-            <CreditCard size={18} className="text-green-600" />
+            <CreditCard size={18} className="text-green-600 dark:text-green-400" />
             <div>
-              <h2 className="font-semibold text-gray-800">Crédito</h2>
-              <p className="text-sm text-gray-400">{cliente.nombreCompleto}</p>
+              <h2 className="font-semibold text-heading">Crédito</h2>
+              <p className="text-sm text-muted">{cliente.nombreCompleto}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-1 text-muted hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
             <X size={20} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b px-6 flex-shrink-0">
+        <div className="flex border-b border-gray-200 dark:border-slate-700 px-6 flex-shrink-0 overflow-x-auto">
           {[
             { key: 'resumen', label: 'Resumen' },
             { key: 'abono', label: 'Registrar abono' },
@@ -231,10 +231,10 @@ export default function ModalCredito({ cliente, onClose }) {
             <button
               key={t.key}
               onClick={() => { setTab(t.key); setError('') }}
-              className={`px-3 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-3 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
                 tab === t.key
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-muted hover:text-heading'
               }`}
             >
               {t.label}
@@ -254,24 +254,24 @@ export default function ModalCredito({ cliente, onClose }) {
             ) : credito ? (
               <div className="space-y-4">
                 {/* Totales */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-gray-400 mb-1">Total deuda</p>
-                    <p className="font-bold text-gray-800 text-sm">{formatCOP(credito.montoTotalCop)}</p>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-2 sm:p-3 text-center">
+                    <p className="text-xs text-muted mb-1">Total deuda</p>
+                    <p className="font-bold text-heading text-sm">{formatCOP(credito.montoTotalCop)}</p>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-gray-400 mb-1">Pagado</p>
-                    <p className="font-bold text-green-700 text-sm">{formatCOP(credito.montoPagadoCop)}</p>
+                  <div className="bg-green-50 dark:bg-green-500/10 rounded-lg p-2 sm:p-3 text-center">
+                    <p className="text-xs text-muted mb-1">Pagado</p>
+                    <p className="font-bold text-green-700 dark:text-green-400 text-sm">{formatCOP(credito.montoPagadoCop)}</p>
                   </div>
-                  <div className="bg-red-50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-gray-400 mb-1">Restante</p>
-                    <p className="font-bold text-red-700 text-sm">{formatCOP(credito.montoRestanteCop)}</p>
+                  <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-2 sm:p-3 text-center">
+                    <p className="text-xs text-muted mb-1">Restante</p>
+                    <p className="font-bold text-red-700 dark:text-red-400 text-sm">{formatCOP(credito.montoRestanteCop)}</p>
                   </div>
                 </div>
 
                 {/* Barra progreso */}
                 <div>
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex justify-between text-xs text-muted mb-1">
                     <span>Progreso de pago</span>
                     <span>
                       {credito.montoTotalCop > 0
@@ -279,7 +279,7 @@ export default function ModalCredito({ cliente, onClose }) {
                         : 0}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
                     <div
                       className="bg-green-500 h-2 rounded-full transition-all"
                       style={{
@@ -294,7 +294,7 @@ export default function ModalCredito({ cliente, onClose }) {
                 {/* Historial movimientos */}
                 {credito.movimientos?.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                    <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                       Historial
                     </p>
                     <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -302,14 +302,14 @@ export default function ModalCredito({ cliente, onClose }) {
                         const esDeuda = m.montoCop < 0
                         const nota = m.notas?.replace('DEUDA: ', '') || ''
                         return (
-                          <div key={i} className="flex items-start justify-between py-1.5 border-b border-gray-50 last:border-0">
+                          <div key={i} className="flex items-start justify-between py-1.5 border-b border-gray-50 dark:border-slate-700 last:border-0">
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-gray-700 truncate">
+                              <p className="text-xs font-medium text-heading truncate">
                                 {esDeuda ? '📤 ' : '💰 '}{nota}
                               </p>
-                              <p className="text-xs text-gray-400">{formatFecha(m.fecha)}</p>
+                              <p className="text-xs text-muted">{formatFecha(m.fecha)}</p>
                             </div>
-                            <span className={`text-xs font-semibold ml-2 flex-shrink-0 ${esDeuda ? 'text-red-600' : 'text-green-600'}`}>
+                            <span className={`text-xs font-semibold ml-2 flex-shrink-0 ${esDeuda ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                               {esDeuda ? '-' : '+'}{formatCOP(Math.abs(m.montoCop))}
                             </span>
                           </div>
@@ -319,31 +319,31 @@ export default function ModalCredito({ cliente, onClose }) {
                   </div>
                 )}
 
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-muted text-center">
                   Crédito desde {formatFecha(credito.creadoEn)}
                 </p>
 
                 {/* Exportar */}
                 <button
                   onClick={() => generarPDF(credito, cliente)}
-                  className="w-full py-2 border border-gray-300 rounded-lg text-xs font-medium hover:bg-gray-50 transition-colors"
+                  className="w-full py-2 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-xs font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   📄 Exportar PDF
                 </button>
               </div>
             ) : (
-              <p className="text-gray-400 text-sm text-center py-6">Sin crédito activo</p>
+              <p className="text-muted text-sm text-center py-6">Sin crédito activo</p>
             )
           )}
 
           {/* Tab abono */}
           {tab === 'abono' && (
             <form onSubmit={handleAbono} className="space-y-3">
-              <p className="text-sm text-gray-500">
-                Restante: <strong className="text-red-600">{formatCOP(credito?.montoRestanteCop)}</strong>
+              <p className="text-sm text-muted">
+                Restante: <strong className="text-red-600 dark:text-red-400">{formatCOP(credito?.montoRestanteCop)}</strong>
               </p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Monto del abono (COP)
                 </label>
                 <input
@@ -351,11 +351,11 @@ export default function ModalCredito({ cliente, onClose }) {
                   placeholder="Ej: 50000"
                   value={montoAbono}
                   onChange={(e) => setMontoAbono(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Notas (opcional)
                 </label>
                 <input
@@ -363,18 +363,18 @@ export default function ModalCredito({ cliente, onClose }) {
                   placeholder="Ej: Pago en efectivo"
                   value={notasAbono}
                   onChange={(e) => setNotasAbono(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Método de pago</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Método de pago</label>
                 <select value={metodoPagoAbono} onChange={(e) => setMetodoPagoAbono(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="EFECTIVO">Efectivo</option>
                   <option value="TRANSFERENCIA">Transferencia</option>
                 </select>
               </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
               <button
                 type="submit"
                 disabled={abonando}
@@ -388,11 +388,11 @@ export default function ModalCredito({ cliente, onClose }) {
           {/* Tab deuda */}
           {tab === 'deuda' && (
             <form onSubmit={handleDeuda} className="space-y-3">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted">
                 Agrega monto a la deuda del cliente (préstamo u otro concepto).
               </p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Monto a agregar (COP)
                 </label>
                 <input
@@ -400,11 +400,11 @@ export default function ModalCredito({ cliente, onClose }) {
                   placeholder="Ej: 100000"
                   value={montoDeuda}
                   onChange={(e) => setMontoDeuda(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Motivo
                 </label>
                 <input
@@ -412,10 +412,10 @@ export default function ModalCredito({ cliente, onClose }) {
                   placeholder="Ej: Préstamo en efectivo, repuesto adelantado..."
                   value={notasDeuda}
                   onChange={(e) => setNotasDeuda(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
               <button
                 type="submit"
                 disabled={agregandoDeuda}

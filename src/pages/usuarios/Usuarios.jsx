@@ -33,14 +33,15 @@ export default function Usuarios() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold text-heading">Usuarios</h1>
           <p className="text-muted text-base mt-1">Gestión del equipo de trabajo</p>
         </div>
         <button
           onClick={() => { setUsuarioEditando(null); setModalAbierto(true) }}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <Plus size={16} />
           Nuevo usuario
