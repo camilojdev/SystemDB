@@ -229,30 +229,32 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">OT #{ot.id}</h2>
-            <p className="text-sm text-gray-400">{ot.placa} — {ot.nombreCliente}</p>
+            <h2 className="text-lg font-semibold text-heading">OT #{ot.id}</h2>
+            <p className="text-sm text-muted">{ot.placa} — {ot.nombreCliente}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => generarPlanillaOT(ot)}
-              className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+              className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               <Download size={14} /> Planilla PDF
             </button>
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+            <button onClick={onClose} className="p-1 text-muted hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
               <X size={20} />
             </button>
           </div>
         </div>
 
-        <div className="flex border-b px-6">
+        <div className="flex border-b border-gray-200 dark:border-slate-700 px-6 overflow-x-auto">
           {['info', 'servicios', 'repuestos'].map((tab) => (
             <button key={tab} onClick={() => setTabActiva(tab)}
-              className={`px-4 py-3 text-sm font-medium capitalize border-b-2 transition-colors ${
-                tabActiva === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+              className={`px-4 py-3 text-sm font-medium capitalize border-b-2 whitespace-nowrap transition-colors ${
+                tabActiva === tab
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-muted hover:text-heading'
               }`}>
               {tab === 'info' ? 'Información' : tab === 'servicios' ? 'Servicios' : 'Repuestos'}
             </button>
@@ -262,50 +264,50 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {tabActiva === 'info' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-400 mb-1">Cliente</p>
-                  <p className="font-medium">{ot.nombreCliente}</p>
-                  <p className="text-gray-500">{ot.celularCliente || '—'}</p>
+                  <p className="text-muted mb-1">Cliente</p>
+                  <p className="font-medium text-heading">{ot.nombreCliente}</p>
+                  <p className="text-muted">{ot.celularCliente || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Vehículo</p>
-                  <p className="font-medium">{ot.placa}</p>
-                  <p className="text-gray-500">{[ot.marcaVehiculo, ot.modeloVehiculo, ot.anioVehiculo].filter(Boolean).join(' ')}</p>
+                  <p className="text-muted mb-1">Vehículo</p>
+                  <p className="font-medium text-heading">{ot.placa}</p>
+                  <p className="text-muted">{[ot.marcaVehiculo, ot.modeloVehiculo, ot.anioVehiculo].filter(Boolean).join(' ')}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Problema</p>
-                  <p className="font-medium">{ot.descripcionProblema}</p>
+                  <p className="text-muted mb-1">Problema</p>
+                  <p className="font-medium text-heading">{ot.descripcionProblema}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Mecánico</p>
-                  <p className="font-medium">{ot.mecanicoNombre || 'No asignado'}</p>
+                  <p className="text-muted mb-1">Mecánico</p>
+                  <p className="font-medium text-heading">{ot.mecanicoNombre || 'No asignado'}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Ingreso</p>
-                  <p className="font-medium">{formatFecha(ot.creadoEn)}</p>
+                  <p className="text-muted mb-1">Ingreso</p>
+                  <p className="font-medium text-heading">{formatFecha(ot.creadoEn)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 mb-1">Entrega prometida</p>
-                  <p className="font-medium">{ot.fechaPrometidaEntrega ? formatFecha(ot.fechaPrometidaEntrega) : '—'}</p>
+                  <p className="text-muted mb-1">Entrega prometida</p>
+                  <p className="font-medium text-heading">{ot.fechaPrometidaEntrega ? formatFecha(ot.fechaPrometidaEntrega) : '—'}</p>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Servicios</span>
-                  <span>{formatCOP(ot.totalServiciosCop)}</span>
+                  <span className="text-muted">Servicios</span>
+                  <span className="text-heading">{formatCOP(ot.totalServiciosCop)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Repuestos</span>
-                  <span>{formatCOP(ot.totalRepuestosCop)}</span>
+                  <span className="text-muted">Repuestos</span>
+                  <span className="text-heading">{formatCOP(ot.totalRepuestosCop)}</span>
                 </div>
                 {ot.descuentoCop > 0 && (
-                  <div className="flex justify-between text-red-600">
+                  <div className="flex justify-between text-red-600 dark:text-red-400">
                     <span>Descuento</span>
                     <span>-{formatCOP(ot.descuentoCop)}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-bold text-base border-t pt-2 mt-2">
+                <div className="flex justify-between font-bold text-base text-heading border-t border-gray-200 dark:border-slate-600 pt-2 mt-2">
                   <span>Total</span>
                   <span>{formatCOP(ot.granTotalCop)}</span>
                 </div>
@@ -316,35 +318,35 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
           {tabActiva === 'servicios' && (
             <div className="space-y-4">
               {ot.servicios?.length > 0 ? (
-                <div className="bg-gray-50 rounded-lg divide-y divide-gray-100">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg divide-y divide-gray-100 dark:divide-slate-600">
                   {ot.servicios.map((s) => (
                     <div key={s.id} className="flex justify-between items-center px-4 py-3 text-sm">
-                      <span>{s.descripcion} x{s.cantidad}</span>
-                      <span className="font-medium">{formatCOP(s.subtotalCop)}</span>
+                      <span className="text-heading">{s.descripcion} x{s.cantidad}</span>
+                      <span className="font-medium text-heading">{formatCOP(s.subtotalCop)}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm text-center py-4">No hay servicios agregados</p>
+                <p className="text-muted text-sm text-center py-4">No hay servicios agregados</p>
               )}
               {ot.estado !== 'ENTREGADO' && ot.estado !== 'CANCELADO' && (
-                <form onSubmit={handleServicio} className="border rounded-lg p-4 space-y-3">
-                  <p className="text-sm font-semibold text-gray-700">Agregar servicio</p>
+                <form onSubmit={handleServicio} className="border border-gray-200 dark:border-slate-600 rounded-lg p-4 space-y-3">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">Agregar servicio</p>
                   <input type="text" placeholder="Descripción del servicio"
                     value={formServicio.descripcion}
                     onChange={(e) => setFormServicio({ ...formServicio, descripcion: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  <div className="grid grid-cols-2 gap-3">
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input type="number" placeholder="Cantidad" min="1"
                       value={formServicio.cantidad}
                       onChange={(e) => setFormServicio({ ...formServicio, cantidad: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <input type="number" placeholder="Precio unitario (COP)"
                       value={formServicio.precioUnitarioCop}
                       onChange={(e) => setFormServicio({ ...formServicio, precioUnitarioCop: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
-                  {errorServicio && <p className="text-red-500 text-xs">{errorServicio}</p>}
+                  {errorServicio && <p className="text-red-500 dark:text-red-400 text-xs">{errorServicio}</p>}
                   <button type="submit" disabled={guardandoServicio}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
                     <Plus size={14} />
@@ -358,23 +360,23 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
           {tabActiva === 'repuestos' && (
             <div className="space-y-4">
               {ot.repuestos?.length > 0 ? (
-                <div className="bg-gray-50 rounded-lg divide-y divide-gray-100">
+                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg divide-y divide-gray-100 dark:divide-slate-600">
                   {ot.repuestos.map((r) => (
                     <div key={r.id} className="flex justify-between items-center px-4 py-3 text-sm">
-                      <span>{r.nombreRepuesto} x{r.cantidad}</span>
-                      <span className="font-medium">{formatCOP(r.subtotalCop)}</span>
+                      <span className="text-heading">{r.nombreRepuesto} x{r.cantidad}</span>
+                      <span className="font-medium text-heading">{formatCOP(r.subtotalCop)}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm text-center py-4">No hay repuestos agregados</p>
+                <p className="text-muted text-sm text-center py-4">No hay repuestos agregados</p>
               )}
               {ot.estado !== 'ENTREGADO' && ot.estado !== 'CANCELADO' && (
-                <form onSubmit={handleRepuesto} className="border rounded-lg p-4 space-y-3">
-                  <p className="text-sm font-semibold text-gray-700">Agregar repuesto</p>
+                <form onSubmit={handleRepuesto} className="border border-gray-200 dark:border-slate-600 rounded-lg p-4 space-y-3">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">Agregar repuesto</p>
                   <select value={formRepuesto.productoId}
                     onChange={(e) => setFormRepuesto({ ...formRepuesto, productoId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Seleccionar producto</option>
                     {productos.map((p) => (
                       <option key={p.id} value={p.id}>
@@ -385,8 +387,8 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
                   <input type="number" placeholder="Cantidad" min="1"
                     value={formRepuesto.cantidad}
                     onChange={(e) => setFormRepuesto({ ...formRepuesto, cantidad: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  {errorRepuesto && <p className="text-red-500 text-xs">{errorRepuesto}</p>}
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  {errorRepuesto && <p className="text-red-500 dark:text-red-400 text-xs">{errorRepuesto}</p>}
                   <button type="submit" disabled={guardandoRepuesto}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
                     <Plus size={14} />
@@ -399,7 +401,7 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
         </div>
 
         {siguienteEstado && (
-          <div className="p-6 border-t">
+          <div className="p-6 border-t border-gray-200 dark:border-slate-700">
             <button onClick={() => avanzar()} disabled={avanzando}
               className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
               <ChevronRight size={16} />
