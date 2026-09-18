@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getProductos, buscarProductos, eliminarProducto, ajustarStock } from '../../api/inventario'
+import { getProductos, buscarProductos, eliminarProducto } from '../../api/inventario'
 import { formatCOP } from '../../utils/formato'
 import { Search, Plus, Trash2, Edit2, AlertTriangle, BarChart3, Package, SlidersHorizontal } from 'lucide-react'
 import ModalProducto from './ModalProducto'

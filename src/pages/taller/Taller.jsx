@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getOrdenes, buscarOrdenes, cambiarEstado } from '../../api/taller'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getOrdenes, buscarOrdenes } from '../../api/taller'
 import { formatCOP, formatFecha } from '../../utils/formato'
 import { Search, Plus, Wrench, Eye } from 'lucide-react'
 import ModalCrearOT from './ModalCrearOT'

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getCajaActual } from '../../api/caja'
 import { getVentasHoy } from '../../api/pos'
 import { formatCOP } from '../../utils/formato'
-import { ShoppingCart, DollarSign, Users, TrendingUp } from 'lucide-react'
+import { ShoppingCart, DollarSign, TrendingUp } from 'lucide-react'
 import useCajaStore from '../../store/cajaStore'
 
 export default function DashboardCajera() {

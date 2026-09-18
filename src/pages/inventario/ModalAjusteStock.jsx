@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { ajustarStock } from '../../api/inventario'
 import { X, SlidersHorizontal, Plus, Minus } from 'lucide-react'
-import { formatCOP } from '../../utils/formato'
 
 export default function ModalAjusteStock({ producto, onClose, onSuccess }) {
   const [tipo, setTipo] = useState('entrada')
