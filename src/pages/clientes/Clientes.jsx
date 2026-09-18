@@ -54,21 +54,14 @@ export default function Clientes() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-3xl font-bold text-heading">Clientes</h1>
-            <p className="text-muted text-base mt-1">Gestión de clientes y fidelización</p>
-          </div>
-          {!isLoading && clientes.length > 0 && (
-            <span className="bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-sm font-medium px-2.5 py-1 rounded-full">
-              {clientes.length}{!busqueda && totalPaginas > 1 ? ' de esta página' : ''}
-            </span>
-          )}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold text-heading">Clientes</h1>
+          <p className="text-muted text-base mt-1">Gestión de clientes y fidelización</p>
         </div>
         <button
           onClick={handleNuevo}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <Plus size={16} />
           Nuevo cliente

@@ -122,7 +122,7 @@ export default function ConfiguracionNegocio() {
           {mensaje && <p className="text-sm text-green-600 dark:text-green-400">{mensaje}</p>}
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
-          <button type="submit" disabled={guardando} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium rounded-lg transition-colors">
+          <button type="submit" disabled={guardando} className="px-5 py-2.5 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-medium rounded-lg transition-colors">
             {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
         </form>

@@ -11,12 +11,12 @@ const getKardex = (id, pagina = 0) =>
     .then((r) => r.data.datos)
 
 const TIPO_CONFIG = {
-  ENTRADA: { label: 'Entrada', color: 'text-green-600', bg: 'bg-green-100', icono: TrendingUp },
-  VENTA: { label: 'Venta', color: 'text-red-600', bg: 'bg-red-100', icono: TrendingDown },
-  AJUSTE: { label: 'Ajuste', color: 'text-blue-600', bg: 'bg-blue-100', icono: TrendingUp },
-  USO_TALLER: { label: 'Uso taller', color: 'text-orange-600', bg: 'bg-orange-100', icono: TrendingDown },
-  DEVOLUCION_ENTRADA: { label: 'Dev. entrada', color: 'text-purple-600', bg: 'bg-purple-100', icono: TrendingDown },
-  DEVOLUCION_SALIDA: { label: 'Dev. salida', color: 'text-teal-600', bg: 'bg-teal-100', icono: TrendingUp },
+  ENTRADA: { label: 'Entrada', color: 'text-green-600 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-500/20', icono: TrendingUp },
+  VENTA: { label: 'Venta', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-500/20', icono: TrendingDown },
+  AJUSTE: { label: 'Ajuste', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-100 dark:bg-blue-500/20', icono: TrendingUp },
+  USO_TALLER: { label: 'Uso taller', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-100 dark:bg-orange-500/20', icono: TrendingDown },
+  DEVOLUCION_ENTRADA: { label: 'Dev. entrada', color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-100 dark:bg-purple-500/20', icono: TrendingDown },
+  DEVOLUCION_SALIDA: { label: 'Dev. salida', color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-100 dark:bg-teal-500/20', icono: TrendingUp },
 }
 
 function generarPDFKardex(producto, movimientos) {
@@ -78,24 +78,24 @@ export default function ModalKardex({ producto, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-6 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Kardex — {producto.nombre}</h2>
-            <p className="text-sm text-gray-400">
-              Código: {producto.codigo} · Stock actual: <strong>{producto.stockActual}</strong>
+            <h2 className="text-lg font-semibold text-heading">Kardex — {producto.nombre}</h2>
+            <p className="text-sm text-muted">
+              Código: {producto.codigo} · Stock actual: <strong className="text-heading">{producto.stockActual}</strong>
             </p>
           </div>
           <div className="flex items-center gap-2">
             {movimientos.length > 0 && (
               <button
                 onClick={() => generarPDFKardex(producto, movimientos)}
-                className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
               >
                 <Download size={14} /> PDF
               </button>
             )}
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+            <button onClick={onClose} className="p-1 text-muted hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
               <X size={20} />
             </button>
           </div>
@@ -108,31 +108,32 @@ export default function ModalKardex({ producto, onClose }) {
             </div>
           ) : movimientos.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-400">Sin movimientos registrados</p>
+              <p className="text-muted">Sin movimientos registrados</p>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100 sticky top-0">
+              <thead className="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700 sticky top-0">
                 <tr>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-6 py-3">Tipo</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-6 py-3">Cantidad</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-6 py-3">Stock antes</th>
-                  <th className="text-center text-xs font-semibold text-gray-500 uppercase px-6 py-3">Stock después</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 uppercase px-6 py-3">Costo unit.</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-6 py-3">Registrado por</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-6 py-3">Notas</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase px-6 py-3">Fecha</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-6 py-3">Tipo</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-6 py-3">Cantidad</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-6 py-3">Stock antes</th>
+                  <th className="text-center text-xs font-semibold text-muted uppercase px-6 py-3">Stock después</th>
+                  <th className="text-right text-xs font-semibold text-muted uppercase px-6 py-3">Costo unit.</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-6 py-3">Registrado por</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-6 py-3">Notas</th>
+                  <th className="text-left text-xs font-semibold text-muted uppercase px-6 py-3">Fecha</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-slate-700">
                 {movimientos.map((m) => {
                   const config = TIPO_CONFIG[m.tipoMovimiento] || {
-                    label: m.tipoMovimiento, color: 'text-gray-600',
-                    bg: 'bg-gray-100', icono: TrendingUp
+                    label: m.tipoMovimiento, color: 'text-muted',
+                    bg: 'bg-gray-100 dark:bg-slate-700', icono: TrendingUp
                   }
                   const Icono = config.icono
                   return (
-                    <tr key={m.id} className="hover:bg-gray-50">
+                    <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
                       <td className="px-6 py-3">
                         <div className="flex items-center gap-2">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center ${config.bg}`}>
@@ -141,36 +142,37 @@ export default function ModalKardex({ producto, onClose }) {
                           <span className={`text-sm font-medium ${config.color}`}>{config.label}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-3 text-center text-sm font-semibold">{m.cantidad}</td>
-                      <td className="px-6 py-3 text-center text-sm text-gray-500">{m.stockAntes}</td>
-                      <td className="px-6 py-3 text-center text-sm font-medium">{m.stockDespues}</td>
-                      <td className="px-6 py-3 text-right text-sm">
+                      <td className="px-6 py-3 text-center text-sm font-semibold text-heading">{m.cantidad}</td>
+                      <td className="px-6 py-3 text-center text-sm text-muted">{m.stockAntes}</td>
+                      <td className="px-6 py-3 text-center text-sm font-medium text-heading">{m.stockDespues}</td>
+                      <td className="px-6 py-3 text-right text-sm text-heading">
                         {m.costoUnitarioCop
                           ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(m.costoUnitarioCop)
                           : '—'}
                       </td>
-                      <td className="px-6 py-3 text-sm text-gray-500">{m.registradoPor || '—'}</td>
-                      <td className="px-6 py-3 text-sm text-gray-500 max-w-32 truncate">{m.notas || '—'}</td>
-                      <td className="px-6 py-3 text-sm text-gray-500">{formatFecha(m.creadoEn)}</td>
+                      <td className="px-6 py-3 text-sm text-muted">{m.registradoPor || '—'}</td>
+                      <td className="px-6 py-3 text-sm text-muted max-w-32 truncate">{m.notas || '—'}</td>
+                      <td className="px-6 py-3 text-sm text-muted">{formatFecha(m.creadoEn)}</td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
 
         {totalPaginas > 1 && (
-          <div className="flex items-center justify-center gap-2 p-4 border-t">
+          <div className="flex items-center justify-center gap-2 p-4 border-t border-gray-200 dark:border-slate-700">
             <button onClick={() => setPagina((p) => Math.max(0, p - 1))}
               disabled={pagina === 0}
-              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+              className="px-3 py-1.5 text-sm text-heading border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
               Anterior
             </button>
-            <span className="text-sm text-gray-500">Página {pagina + 1} de {totalPaginas}</span>
+            <span className="text-sm text-muted">Página {pagina + 1} de {totalPaginas}</span>
             <button onClick={() => setPagina((p) => Math.min(totalPaginas - 1, p + 1))}
               disabled={pagina >= totalPaginas - 1}
-              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">
+              className="px-3 py-1.5 text-sm text-heading border border-gray-200 dark:border-slate-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
               Siguiente
             </button>
           </div>

@@ -56,38 +56,38 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
 
   const campo = (label, name, type = 'text') => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{label}</label>
       <input
         type={type}
         value={form[name]}
         onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
     </div>
   )
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white">
-          <h2 className="text-lg font-semibold text-gray-800">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800">
+          <h2 className="text-lg font-semibold text-heading">
             {esEdicion ? 'Editar producto' : 'Nuevo producto'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-1 text-muted hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
             <X size={20} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {campo('Nombre', 'nombre')}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campo('Código', 'codigo')}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Categoría</label>
               <select
                 value={form.categoriaId}
                 onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Sin categoría</option>
                 {categorias.map((c) => (
@@ -97,11 +97,11 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
             </div>
           </div>
           {campo('Descripción', 'descripcion')}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campo('Precio de compra (COP)', 'precioCompraConIva', 'number')}
             {campo('Precio de venta (COP)', 'precioVentaDetal', 'number')}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campo('Stock inicial', 'stockActual', 'number')}
             {campo('Stock mínimo', 'stockMinimo', 'number')}
           </div>
@@ -114,20 +114,20 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
               onChange={(e) => setForm({ ...form, mostrarEnListaPrecios: e.target.checked })}
               className="rounded"
             />
-            <label htmlFor="mostrarEnListaPrecios" className="text-sm text-gray-700">
+            <label htmlFor="mostrarEnListaPrecios" className="text-sm text-gray-700 dark:text-slate-300">
               Mostrar en lista de precios
             </label>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+            <p className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+              className="flex-1 py-2 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               Cancelar
             </button>
