@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getProveedores, crearProveedor, actualizarProveedor, desactivarProveedor } from '../../api/inventario'
+import { getProveedores, desactivarProveedor } from '../../api/inventario'
 import { Plus, Edit2, UserX, Truck } from 'lucide-react'
 import ModalProveedor from './ModalProveedor'
 

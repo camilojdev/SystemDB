@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { formatCOP, formatFecha } from '../../utils/formato'
+import { formatFecha } from '../../utils/formato'
 import { X, TrendingUp, TrendingDown, Download } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 import { NOMBRE_NEGOCIO } from '../../utils/marca'

@@ -6,9 +6,9 @@ import { X, CreditCard } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 import { NOMBRE_NEGOCIO } from '../../utils/marca'
 
-const fmt = (n) => new Intl.NumberFormat('es-CO', {
+/*const fmt = (n) => new Intl.NumberFormat('es-CO', {
   style: 'currency', currency: 'COP', minimumFractionDigits: 0
-}).format(Math.abs(n))
+}).format(Math.abs(n))*/
 
 function generarPDF(credito, cliente) {
   const doc = new jsPDF()
