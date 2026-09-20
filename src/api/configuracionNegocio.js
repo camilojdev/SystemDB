@@ -11,3 +11,11 @@ export const subirLogoNegocio = (archivo) => {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 }
+
+export const subirLogoEtiquetas = (archivo) => {
+  const formData = new FormData()
+  formData.append('archivo', archivo)
+  return api.post('/configuracion-negocio/logo-etiquetas', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
