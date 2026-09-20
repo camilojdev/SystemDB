@@ -6,6 +6,7 @@ import { Search, Plus, Trash2, Edit2, AlertTriangle, BarChart3, Package, Sliders
 import ModalProducto from './ModalProducto'
 import ModalKardex from './ModalKardex'
 import ModalAjusteStock from './ModalAjusteStock'
+import ModalGenerarEtiquetas from './ModalGenerarEtiquetas'
 
 function estadoStock(stock, minimo) {
   if (stock === 0) return { label: 'Agotado', dot: 'bg-red-500', texto: 'text-red-700 dark:text-red-300', fondo: 'bg-red-100 dark:bg-red-500/20', borde: 'border-l-red-500' }
@@ -22,7 +23,6 @@ function BadgeStock({ stock, minimo }) {
     </span>
   )
 }
-
 export default function Inventario() {
   const queryClient = useQueryClient()
   const [busqueda, setBusqueda] = useState('')
@@ -31,6 +31,7 @@ export default function Inventario() {
   const [productoEditando, setProductoEditando] = useState(null)
   const [productoKardex, setProductoKardex] = useState(null)
   const [productoAjuste, setProductoAjuste] = useState(null)
+  const [productoParaEtiquetas, setProductoParaEtiquetas] = useState(null)
 
   const { data, isLoading } = useQuery({
     queryKey: busqueda.length >= 2 ? ['productos-busqueda', busqueda] : ['productos', pagina],
@@ -56,6 +57,14 @@ export default function Inventario() {
   const handleNuevo = () => { setProductoEditando(null); setModalAbierto(true) }
   const handleEliminar = (id, nombre) => {
     if (confirm(`¿Desactivar el producto "${nombre}"?`)) eliminar(id)
+  }
+
+  const handleExitoProducto = (productoGuardado, meta) => {
+    setModalAbierto(false)
+    queryClient.invalidateQueries(['productos'])
+    if (!meta.esEdicion || meta.codigoCambio) {
+      setProductoParaEtiquetas(productoGuardado)
+    }
   }
 
   return (
@@ -90,12 +99,13 @@ export default function Inventario() {
             <p className="text-muted">No se encontraron productos</p>
           </div>
         ) : (
-          <div className="overflow-x-auto max-h-[70vh]">
+ <div className="overflow-x-auto max-h-[70vh]">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700 sticky top-0 z-10">
               <tr>
                 <th className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">Producto</th>
                 <th className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">Código</th>
+                <th className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">N.° Interno</th>
                 <th className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">Categoría</th>
                 <th className="text-right text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">Precio venta</th>
                 <th className="text-center text-xs font-semibold text-muted uppercase tracking-wider px-6 py-3">Stock</th>
@@ -120,6 +130,7 @@ export default function Inventario() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-muted font-mono">{p.codigo}</td>
+                  <td className="px-6 py-4 text-sm text-muted font-mono">{p.numeroInterno || '—'}</td>
                   <td className="px-6 py-4 text-sm text-heading">{p.categoriaNombre || '—'}</td>
                   <td className="px-6 py-4 text-sm text-right font-medium text-heading">{formatCOP(p.precioVentaDetal)}</td>
                   <td className="px-6 py-4 text-center">
@@ -133,7 +144,7 @@ export default function Inventario() {
                       <span className="text-xs text-muted">/ mín {p.stockMinimo}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-center">
+<td className="px-6 py-4 text-center">
                     <BadgeStock stock={p.stockActual} minimo={p.stockMinimo} />
                   </td>
                   <td className="px-6 py-4">
@@ -164,8 +175,7 @@ export default function Inventario() {
           </div>
         )}
       </div>
-
-      {!busqueda && totalPaginas > 1 && (
+{!busqueda && totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-2">
           <button onClick={() => setPagina((p) => Math.max(0, p - 1))} disabled={pagina === 0}
             className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 text-heading rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
@@ -181,7 +191,7 @@ export default function Inventario() {
 
       {modalAbierto && (
         <ModalProducto producto={productoEditando} onClose={() => setModalAbierto(false)}
-          onSuccess={() => { setModalAbierto(false); queryClient.invalidateQueries(['productos']) }} />
+          onSuccess={handleExitoProducto} />
       )}
       {productoKardex && (
         <ModalKardex producto={productoKardex} onClose={() => setProductoKardex(null)} />
@@ -194,6 +204,13 @@ export default function Inventario() {
             setProductoAjuste(null)
             queryClient.invalidateQueries(['productos'])
           }}
+        />
+      )}
+      {productoParaEtiquetas && (
+        <ModalGenerarEtiquetas
+          producto={productoParaEtiquetas}
+          cantidadSugerida={productoParaEtiquetas.stockActual}
+          onClose={() => setProductoParaEtiquetas(null)}
         />
       )}
     </div>

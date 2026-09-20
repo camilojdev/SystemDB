@@ -5,10 +5,12 @@ import { X } from 'lucide-react'
 
 export default function ModalProducto({ producto, onClose, onSuccess }) {
   const esEdicion = !!producto
+  const numeroInternoBloqueado = esEdicion && !!producto?.numeroInterno
 
   const [form, setForm] = useState({
     nombre: producto?.nombre || '',
     codigo: producto?.codigo || '',
+    numeroInterno: producto?.numeroInterno || '',
     descripcion: producto?.descripcion || '',
     categoriaId: producto?.categoriaId || '',
     precioCompraConIva: producto?.precioCompraConIva || '',
@@ -31,7 +33,11 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
   const { mutate, isPending } = useMutation({
     mutationFn: (datos) =>
       esEdicion ? actualizarProducto(producto.id, datos) : crearProducto(datos),
-    onSuccess,
+    onSuccess: (res) => {
+      const productoGuardado = res.data.datos
+      const codigoCambio = esEdicion && producto.codigo !== form.codigo
+      onSuccess(productoGuardado, { esEdicion, codigoCambio })
+    },
     onError: (err) => {
       setError(err.response?.data?.mensaje || 'Error al guardar el producto')
     },
@@ -47,6 +53,7 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
     mutate({
         ...form,
         categoriaId: form.categoriaId ? Number(form.categoriaId) : null,
+        numeroInterno: form.numeroInterno ? String(form.numeroInterno).trim() : null,
         precioCompraConIva: Number(form.precioCompraConIva),
         precioVentaCop: Number(form.precioVentaDetal),
         stockActual: Number(form.stockActual),
@@ -77,11 +84,25 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
             <X size={20} />
           </button>
         </div>
-
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {campo('Nombre', 'nombre')}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campo('Código', 'codigo')}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Número interno {numeroInternoBloqueado && <span className="text-xs text-muted">(no se puede cambiar)</span>}
+              </label>
+              <input
+                type="text"
+                value={form.numeroInterno}
+                onChange={(e) => setForm({ ...form, numeroInterno: e.target.value })}
+                disabled={numeroInternoBloqueado}
+                placeholder="Ej. 123"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Categoría</label>
               <select
@@ -95,8 +116,8 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
                 ))}
               </select>
             </div>
+            {campo('Descripción', 'descripcion')}
           </div>
-          {campo('Descripción', 'descripcion')}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {campo('Precio de compra (COP)', 'precioCompraConIva', 'number')}
             {campo('Precio de venta (COP)', 'precioVentaDetal', 'number')}
@@ -122,7 +143,6 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
           {error && (
             <p className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>
           )}
-
           <div className="flex gap-3 pt-2">
             <button
               type="button"
