@@ -6,6 +6,12 @@ export const getProductos = (pagina = 0, tamano = 20) =>
 export const buscarProductos = (termino) =>
   api.get(`/inventario/productos/buscar?q=${termino}`)
 
+export const identificarProducto = (codigo) =>
+  api.get(`/inventario/productos/identificar?codigo=${encodeURIComponent(codigo)}`)
+
+export const getHistorialCodigos = (id) =>
+  api.get(`/inventario/productos/${id}/historial-codigos`)
+
 export const crearProducto = (datos) =>
   api.post('/inventario/productos', datos)
 

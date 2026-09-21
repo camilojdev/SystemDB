@@ -13,10 +13,12 @@ import {
   BarChart3,
   LogOut,
   Truck,
-  Tag,
-  DatabaseZap,
   Building2,
   X,
+  Image as ImageIcon,
+  Tag,
+  DatabaseZap,
+  Printer,
 } from 'lucide-react'
 
 const NAV_DUENO = [
@@ -32,6 +34,8 @@ const NAV_DUENO = [
   { to: '/categorias', icon: Tag, label: 'Categorías' },
   { to: '/backup', icon: DatabaseZap, label: 'Copias de seguridad' },
   { to: '/configuracion-negocio', icon: Building2, label: 'Mi Negocio' },
+  { to: '/recursos-graficos', icon: ImageIcon, label: 'Recursos gráficos' },
+  { to: '/centro-etiquetas', icon: Printer, label: 'Centro de Etiquetas' },
 ]
 const NAV_CAJERA = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -39,7 +43,7 @@ const NAV_CAJERA = [
   { to: '/clientes', icon: Users, label: 'Clientes' },
   { to: '/caja', icon: DollarSign, label: 'Caja' },
   { to: '/compras', icon: Truck, label: 'Compras' },
-  { to: '/categorias', icon: Tag, label: 'Categorías' },
+  { to: '/categorias', icon: Tag, label: 'Categorías' }
 ]
 
 const NAV_MECANICO = [
