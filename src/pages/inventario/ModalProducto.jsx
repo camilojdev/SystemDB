@@ -15,8 +15,9 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
     categoriaId: producto?.categoriaId || '',
     precioCompraConIva: producto?.precioCompraConIva || '',
     precioVentaDetal: producto?.precioVentaDetal || '',
+    precioOculto: producto?.precioOculto || '',
     stockActual: producto?.stockActual || 0,
-    stockMinimo: producto?.stockMinimo || 5,
+    stockMinimo: producto?.stockMinimo || 3,
     unidadMedida: producto?.unidadMedida || 'UNIDAD',
     mostrarEnListaPrecios: producto?.mostrarEnListaPrecios || false,
   })
@@ -138,6 +139,19 @@ export default function ModalProducto({ producto, onClose, onSuccess }) {
             <label htmlFor="mostrarEnListaPrecios" className="text-sm text-gray-700 dark:text-slate-300">
               Mostrar en lista de precios
             </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Precio oculto (letras) <span className="text-xs text-muted">(opcional)</span>
+            </label>
+            <input
+              type="text"
+              value={form.precioOculto}
+              onChange={(e) => setForm({ ...form, precioOculto: e.target.value.toUpperCase() })}
+              placeholder="Ej. NVLLLLL"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           {error && (
