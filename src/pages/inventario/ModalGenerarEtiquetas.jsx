@@ -1,11 +1,25 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { X, Tag } from 'lucide-react'
-import { generarEtiquetasAhora, agregarEtiquetasACola } from '../../utils/etiquetas'
+import useColaEtiquetasStore from '../../store/colaEtiquetasStore'
 
 export default function ModalGenerarEtiquetas({ producto, cantidadSugerida, onClose }) {
+  const navigate = useNavigate()
+  const agregarACola = useColaEtiquetasStore((s) => s.agregar)
   const [cantidad, setCantidad] = useState(cantidadSugerida > 0 ? cantidadSugerida : 1)
 
   if (!producto) return null
+
+  const handleGenerarAhora = () => {
+    agregarACola(producto, cantidad)
+    onClose()
+    navigate('/centro-etiquetas')
+  }
+
+  const handleAgregarACola = () => {
+    agregarACola(producto, cantidad)
+    onClose()
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -36,22 +50,13 @@ export default function ModalGenerarEtiquetas({ producto, cantidadSugerida, onCl
         </div>
 
         <div className="flex flex-col gap-2">
-          <button
-            onClick={() => { generarEtiquetasAhora(producto, cantidad); onClose() }}
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
-          >
+          <button onClick={handleGenerarAhora} className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
             Generar ahora
           </button>
-          <button
-            onClick={() => { agregarEtiquetasACola(producto, cantidad); onClose() }}
-            className="w-full py-2 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
-          >
+          <button onClick={handleAgregarACola} className="w-full py-2 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700">
             Agregar a cola
           </button>
-          <button
-            onClick={onClose}
-            className="w-full py-2 text-sm text-muted hover:underline"
-          >
+          <button onClick={onClose} className="w-full py-2 text-sm text-muted hover:underline">
             Después
           </button>
         </div>

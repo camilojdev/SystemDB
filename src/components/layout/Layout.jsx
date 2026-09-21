@@ -19,6 +19,7 @@ import Backup from '../../pages/administracion/Backup'
 import Perfil from '../../pages/perfil/Perfil'
 import ConfiguracionNegocio from '../../pages/administracion/ConfiguracionNegocio'
 import RecursosGraficos from '../../pages/administracion/RecursosGraficos'
+import CentroEtiquetas from '../../pages/inventario/CentroEtiquetas'
 
 export default function Layout() {
   const usuario = useAuthStore((s) => s.usuario)
@@ -61,6 +62,7 @@ export default function Layout() {
             <Route path="/perfil" element={<Perfil />} />
             {esDueno && <Route path="/configuracion-negocio" element={<ConfiguracionNegocio />} />}
             {esDueno && <Route path="/recursos-graficos" element={<RecursosGraficos />} />}
+            {esDueno && <Route path="/centro-etiquetas" element={<CentroEtiquetas />} />}
           </Routes>
         </main>
       </div>
