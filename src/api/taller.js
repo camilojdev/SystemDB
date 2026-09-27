@@ -22,3 +22,6 @@ export const agregarServicio = (id, datos) =>
 
 export const agregarRepuesto = (id, datos) =>
   api.post(`/taller/ordenes/${id}/repuestos`, datos)
+
+export const descargarPlanillaOt = (id) =>
+  api.get(`/taller/ordenes/${id}/planilla`, { responseType: 'blob' })
