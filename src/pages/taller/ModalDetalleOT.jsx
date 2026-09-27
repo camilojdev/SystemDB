@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { cambiarEstado, agregarServicio, agregarRepuesto } from '../../api/taller'
+import { cambiarEstado, agregarServicio, agregarRepuesto, descargarPlanillaOt } from '../../api/taller'
 import { getProductos } from '../../api/inventario'
 import { formatCOP, formatFecha } from '../../utils/formato'
 import { X, ChevronRight, Plus, Download } from 'lucide-react'
-import { jsPDF } from 'jspdf'
-import { NOMBRE_NEGOCIO } from '../../utils/marca'
 
 const ESTADOS_SIGUIENTES = {
   RECIBIDO: 'EN_DIAGNOSTICO',
@@ -23,148 +21,13 @@ const LABELS = {
   LISTO: 'Marcar entregado',
 }
 
-function generarPlanillaOT(ot) {
-  const doc = new jsPDF()
-  const fmt = (n) => new Intl.NumberFormat('es-CO', {
-    style: 'currency', currency: 'COP', minimumFractionDigits: 0
-  }).format(n || 0)
-
-  // Header
-  doc.setFontSize(18); doc.setFont('helvetica', 'bold')
-  doc.text(NOMBRE_NEGOCIO, 14, 20)
-  doc.setFontSize(10); doc.setFont('helvetica', 'normal')
-  doc.text('Taller automotriz', 14, 27)
-  doc.setFontSize(14); doc.setFont('helvetica', 'bold')
-  doc.text(`ORDEN DE TRABAJO #${ot.id}`, 120, 20)
-  doc.setFontSize(10); doc.setFont('helvetica', 'normal')
-  doc.text(`Estado: ${ot.estado}`, 120, 27)
-  doc.line(14, 32, 196, 32)
-
-  // Info cliente y vehículo
-  let y = 40
-  doc.setFont('helvetica', 'bold')
-  doc.text('DATOS DEL CLIENTE', 14, y); y += 7
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Nombre: ${ot.nombreCliente || '—'}`, 14, y)
-  doc.text(`Celular: ${ot.celularCliente || '—'}`, 110, y); y += 6
-  doc.text(`Ingreso: ${ot.creadoEn ? new Date(ot.creadoEn).toLocaleString('es-CO') : '—'}`, 14, y)
-  doc.text(`Entrega prometida: ${ot.fechaPrometidaEntrega ? new Date(ot.fechaPrometidaEntrega).toLocaleDateString('es-CO') : '—'}`, 110, y); y += 10
-
-  doc.setFont('helvetica', 'bold')
-  doc.text('DATOS DEL VEHÍCULO', 14, y); y += 7
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Placa: ${ot.placa || '—'}`, 14, y)
-  doc.text(`Marca: ${ot.marcaVehiculo || '—'}`, 70, y)
-  doc.text(`Modelo: ${ot.modeloVehiculo || '—'}`, 120, y); y += 6
-  doc.text(`Año: ${ot.anioVehiculo || '—'}`, 14, y)
-  doc.text(`Color: ${ot.colorVehiculo || '—'}`, 70, y)
-  doc.text(`Km: ${ot.kilometraje || '—'}`, 120, y); y += 6
-  doc.text(`Mecánico: ${ot.mecanicoNombre || 'No asignado'}`, 14, y); y += 10
-
-  doc.line(14, y, 196, y); y += 7
-  doc.setFont('helvetica', 'bold')
-  doc.text('DESCRIPCIÓN DEL PROBLEMA', 14, y); y += 7
-  doc.setFont('helvetica', 'normal')
-  const problemaLineas = doc.splitTextToSize(ot.descripcionProblema || '—', 180)
-  doc.text(problemaLineas, 14, y)
-  y += problemaLineas.length * 6 + 4
-
-  if (ot.observacionesMecanico) {
-    doc.setFont('helvetica', 'bold')
-    doc.text('OBSERVACIONES DEL MECÁNICO', 14, y); y += 7
-    doc.setFont('helvetica', 'normal')
-    const obsLineas = doc.splitTextToSize(ot.observacionesMecanico, 180)
-    doc.text(obsLineas, 14, y)
-    y += obsLineas.length * 6 + 4
-  }
-
-  // Servicios
-  if (ot.servicios?.length > 0) {
-    doc.line(14, y, 196, y); y += 7
-    doc.setFont('helvetica', 'bold')
-    doc.text('SERVICIOS', 14, y); y += 7
-    doc.setFillColor(240, 240, 240)
-    doc.rect(14, y - 5, 182, 7, 'F')
-    doc.text('Descripción', 16, y)
-    doc.text('Cant.', 130, y)
-    doc.text('Precio unit.', 148, y)
-    doc.text('Subtotal', 175, y)
-    y += 5
-    doc.setFont('helvetica', 'normal')
-    ot.servicios.forEach((s) => {
-      if (y > 260) { doc.addPage(); y = 20 }
-      doc.text((s.descripcion || '').substring(0, 45), 16, y)
-      doc.text(String(s.cantidad), 130, y)
-      doc.text(fmt(s.precioUnitarioCop), 145, y)
-      doc.text(fmt(s.subtotalCop), 172, y)
-      y += 6
-    })
-    y += 2
-  }
-
-  // Repuestos
-  if (ot.repuestos?.length > 0) {
-    doc.line(14, y, 196, y); y += 7
-    doc.setFont('helvetica', 'bold')
-    doc.text('REPUESTOS', 14, y); y += 7
-    doc.setFillColor(240, 240, 240)
-    doc.rect(14, y - 5, 182, 7, 'F')
-    doc.text('Repuesto', 16, y)
-    doc.text('Cant.', 130, y)
-    doc.text('Precio unit.', 148, y)
-    doc.text('Subtotal', 175, y)
-    y += 5
-    doc.setFont('helvetica', 'normal')
-    ot.repuestos.forEach((r) => {
-      if (y > 260) { doc.addPage(); y = 20 }
-      doc.text((r.nombreRepuesto || '').substring(0, 45), 16, y)
-      doc.text(String(r.cantidad), 130, y)
-      doc.text(fmt(r.precioUnitarioCop), 145, y)
-      doc.text(fmt(r.subtotalCop), 172, y)
-      y += 6
-    })
-    y += 2
-  }
-
-  // Totales
-  doc.line(14, y, 196, y); y += 7
-  doc.setFont('helvetica', 'normal')
-  doc.text('Total servicios:', 130, y)
-  doc.text(fmt(ot.totalServiciosCop), 172, y); y += 6
-  doc.text('Total repuestos:', 130, y)
-  doc.text(fmt(ot.totalRepuestosCop), 172, y); y += 6
-  if (ot.descuentoCop > 0) {
-    doc.text('Descuento:', 130, y)
-    doc.setTextColor(220, 38, 38)
-    doc.text(`-${fmt(ot.descuentoCop)}`, 172, y)
-    doc.setTextColor(0, 0, 0); y += 6
-  }
-  doc.setFont('helvetica', 'bold')
-  doc.text('TOTAL:', 130, y)
-  doc.text(fmt(ot.granTotalCop), 172, y); y += 14
-
-  // Firmas
-  if (y > 240) { doc.addPage(); y = 20 }
-  doc.line(14, y, 80, y)
-  doc.line(120, y, 196, y); y += 5
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9)
-  doc.text('Firma del cliente', 30, y)
-  doc.text('Firma del mecánico', 142, y)
-
-  doc.setFontSize(8); doc.setTextColor(150, 150, 150)
-  doc.text(`Generado por ${NOMBRE_NEGOCIO}`, 14, 290)
-  doc.setTextColor(0, 0, 0)
-
-  doc.save(`OT-${ot.id}-${ot.placa}.pdf`)
-}
-
 export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
   const [tabActiva, setTabActiva] = useState('info')
   const [formServicio, setFormServicio] = useState({ descripcion: '', cantidad: 1, precioUnitarioCop: '' })
   const [formRepuesto, setFormRepuesto] = useState({ productoId: '', cantidad: 1 })
   const [errorServicio, setErrorServicio] = useState('')
   const [errorRepuesto, setErrorRepuesto] = useState('')
-
+  const [descargandoPlanilla, setDescargandoPlanilla] = useState(false)
   const siguienteEstado = ESTADOS_SIGUIENTES[ot.estado]
 
   const { mutate: avanzar, isPending: avanzando } = useMutation({
@@ -181,6 +44,25 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
     },
     onError: (err) => setErrorServicio(err.response?.data?.mensaje || 'Error al agregar servicio'),
   })
+
+  const handleDescargarPlanilla = async () => {
+    setDescargandoPlanilla(true)
+    try {
+      const res = await descargarPlanillaOt(ot.id)
+      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      const enlace = document.createElement('a')
+      enlace.href = blobUrl
+      enlace.download = `OT-${ot.id}-${ot.placa}.pdf`
+      document.body.appendChild(enlace)
+      enlace.click()
+      enlace.remove()
+      window.URL.revokeObjectURL(blobUrl)
+    } catch (err) {
+      alert('No se pudo descargar la planilla. Intenta de nuevo.')
+    } finally {
+      setDescargandoPlanilla(false)
+    }
+  }
 
   const { mutate: addRepuesto, isPending: guardandoRepuesto } = useMutation({
     mutationFn: (datos) => agregarRepuesto(ot.id, datos),
@@ -237,10 +119,11 @@ export default function ModalDetalleOT({ ot, onClose, onCambioEstado }) {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => generarPlanillaOT(ot)}
-              className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700"
+              onClick={handleDescargarPlanilla}
+              disabled={descargandoPlanilla}
+              className="flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
             >
-              <Download size={14} /> Planilla PDF
+              <Download size={14} /> {descargandoPlanilla ? 'Generando...' : 'Planilla PDF'}
             </button>
             <button onClick={onClose} className="p-1 text-muted hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
               <X size={20} />
