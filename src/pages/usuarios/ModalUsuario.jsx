@@ -21,6 +21,7 @@ const PERMISOS = [
   { key: 'puedeCerrarCaja', label: 'Cerrar caja' },
   { key: 'puedeVerReportes', label: 'Ver reportes' },
   { key: 'puedeGestionarCredito', label: 'Gestionar crédito' },
+  { key: 'puedeGestionarInventario', label: 'Gestionar inventario (crear, activar, desactivar)' },
 ]
 
 function CampoContrasena({ label, value, onChange, placeholder, hint }) {
@@ -70,6 +71,7 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
     puedeCerrarCaja: usuario?.puedeCerrarCaja || false,
     puedeVerReportes: usuario?.puedeVerReportes || false,
     puedeGestionarCredito: usuario?.puedeGestionarCredito || false,
+    puedeGestionarInventario: usuario?.puedeGestionarInventario || false,
   })
 
   const [contrasenaForm, setContrasenaForm] = useState({
@@ -162,6 +164,7 @@ export default function ModalUsuario({ usuario, onClose, onSuccess }) {
         puedeCerrarCaja: form.puedeCerrarCaja,
         puedeVerReportes: form.puedeVerReportes,
         puedeGestionarCredito: form.puedeGestionarCredito,
+        puedeGestionarInventario: form.puedeGestionarInventario,
       }
     })
   }
