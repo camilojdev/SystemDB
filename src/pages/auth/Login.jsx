@@ -24,8 +24,8 @@ export default function Login() {
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (res) => {
-      const { token, nombreCompleto, rol, nombreUsuario } = res.data.datos
-      setAuth(token, { nombreCompleto, rol, nombreUsuario })
+      const { token, nombreCompleto, rol, nombreUsuario, permisos } = res.data.datos
+      setAuth(token, { nombreCompleto, rol, nombreUsuario, permisos })
       navigate('/dashboard')
     },
     onError: () => {

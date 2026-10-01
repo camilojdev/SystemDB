@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getProductos, buscarProductos, eliminarProducto } from '../../api/inventario'
+import { getProductos, buscarProductos, eliminarProducto, reactivarProducto } from '../../api/inventario'
 import { formatCOP } from '../../utils/formato'
-import { Search, Plus, Trash2, Edit2, AlertTriangle, BarChart3, Package, SlidersHorizontal } from 'lucide-react'
+import useAuthStore from '../../store/authStore'
+import { Search, Plus, Trash2, Edit2, AlertTriangle, BarChart3, Package, SlidersHorizontal, RotateCcw } from 'lucide-react'
 import ModalProducto from './ModalProducto'
 import ModalKardex from './ModalKardex'
 import ModalAjusteStock from './ModalAjusteStock'
@@ -23,10 +24,15 @@ function BadgeStock({ stock, minimo }) {
     </span>
   )
 }
+
 export default function Inventario() {
   const queryClient = useQueryClient()
+  const usuario = useAuthStore((s) => s.usuario)
+  const puedeGestionar = usuario?.rol === 'DUENO' || !!usuario?.permisos?.puedeGestionarInventario
+
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(0)
+  const [mostrarInactivos, setMostrarInactivos] = useState(false)
   const [modalAbierto, setModalAbierto] = useState(false)
   const [productoEditando, setProductoEditando] = useState(null)
   const [productoKardex, setProductoKardex] = useState(null)
@@ -34,11 +40,13 @@ export default function Inventario() {
   const [productoParaEtiquetas, setProductoParaEtiquetas] = useState(null)
 
   const { data, isLoading } = useQuery({
-    queryKey: busqueda.length >= 2 ? ['productos-busqueda', busqueda] : ['productos', pagina],
+    queryKey: busqueda.length >= 2
+      ? ['productos-busqueda', busqueda]
+      : ['productos', pagina, mostrarInactivos],
     queryFn: () =>
       busqueda.length >= 2
         ? buscarProductos(busqueda).then((r) => ({ content: r.data.datos, totalPages: 1 }))
-        : getProductos(pagina).then((r) => r.data.datos),
+        : getProductos(pagina, 20, mostrarInactivos).then((r) => r.data.datos),
     keepPreviousData: true,
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -50,6 +58,11 @@ export default function Inventario() {
     onSuccess: () => queryClient.invalidateQueries(['productos']),
   })
 
+  const { mutate: reactivar } = useMutation({
+    mutationFn: reactivarProducto,
+    onSuccess: () => queryClient.invalidateQueries(['productos']),
+  })
+
   const productos = data?.content || []
   const totalPaginas = data?.totalPages || 1
 
@@ -57,6 +70,9 @@ export default function Inventario() {
   const handleNuevo = () => { setProductoEditando(null); setModalAbierto(true) }
   const handleEliminar = (id, nombre) => {
     if (confirm(`¿Desactivar el producto "${nombre}"?`)) eliminar(id)
+  }
+  const handleReactivar = (id, nombre) => {
+    if (confirm(`¿Reactivar el producto "${nombre}"?`)) reactivar(id)
   }
 
   const handleExitoProducto = (productoGuardado, meta) => {
@@ -75,17 +91,32 @@ export default function Inventario() {
           <h1 className="text-3xl font-bold text-heading">Inventario</h1>
           <p className="text-muted text-base mt-1">Gestión de productos y stock</p>
         </div>
-        <button onClick={handleNuevo}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-          <Plus size={16} /> Nuevo producto
-        </button>
+        {puedeGestionar && (
+          <button onClick={handleNuevo}
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <Plus size={16} /> Nuevo producto
+          </button>
+        )}
       </div>
 
-      <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
-        <input type="text" placeholder="Buscar por nombre o código..."
-          value={busqueda} onChange={(e) => { setBusqueda(e.target.value); setPagina(0) }}
-          className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-heading placeholder-gray-400 dark:placeholder-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+          <input type="text" placeholder="Buscar por nombre o código..."
+            value={busqueda} onChange={(e) => { setBusqueda(e.target.value); setPagina(0) }}
+            className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-heading placeholder-gray-400 dark:placeholder-slate-500 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        {puedeGestionar && !busqueda && (
+          <label className="flex items-center gap-2 text-sm text-heading whitespace-nowrap cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={mostrarInactivos}
+              onChange={(e) => { setMostrarInactivos(e.target.checked); setPagina(0) }}
+              className="rounded"
+            />
+            Ver inactivos
+          </label>
+        )}
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
@@ -117,7 +148,7 @@ export default function Inventario() {
               {productos.map((p) => {
                 const e = estadoStock(p.stockActual, p.stockMinimo)
                 return (
-                <tr key={p.id} className={`border-l-2 ${e.borde} hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors`}>
+                <tr key={p.id} className={`border-l-2 ${e.borde} hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors ${!p.estaActivo ? 'opacity-60' : ''}`}>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -144,8 +175,14 @@ export default function Inventario() {
                       <span className="text-xs text-muted">/ mín {p.stockMinimo}</span>
                     </div>
                   </td>
-<td className="px-6 py-4 text-center">
-                    <BadgeStock stock={p.stockActual} minimo={p.stockMinimo} />
+                  <td className="px-6 py-4 text-center">
+                    {p.estaActivo ? (
+                      <BadgeStock stock={p.stockActual} minimo={p.stockMinimo} />
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300">
+                        Inactivo
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1 justify-end">
@@ -161,10 +198,19 @@ export default function Inventario() {
                         className="p-1.5 text-muted hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors">
                         <BarChart3 size={15} />
                       </button>
-                      <button onClick={() => handleEliminar(p.id, p.nombre)} title="Desactivar"
-                        className="p-1.5 text-muted hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
-                        <Trash2 size={15} />
-                      </button>
+                      {puedeGestionar && (
+                        p.estaActivo ? (
+                          <button onClick={() => handleEliminar(p.id, p.nombre)} title="Desactivar"
+                            className="p-1.5 text-muted hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
+                            <Trash2 size={15} />
+                          </button>
+                        ) : (
+                          <button onClick={() => handleReactivar(p.id, p.nombre)} title="Reactivar"
+                            className="p-1.5 text-muted hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors">
+                            <RotateCcw size={15} />
+                          </button>
+                        )
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -175,7 +221,7 @@ export default function Inventario() {
           </div>
         )}
       </div>
-{!busqueda && totalPaginas > 1 && (
+      {!busqueda && totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-2">
           <button onClick={() => setPagina((p) => Math.max(0, p - 1))} disabled={pagina === 0}
             className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-600 text-heading rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-slate-700">
