@@ -193,12 +193,13 @@ export default function Caja() {
 
   // Sesión del usuario actual
   const { data: cajaData, isLoading } = useQuery({
-    queryKey: ['caja-actual'],
+    queryKey: ['caja-actual', usuario?.id],
     queryFn: () => getCajaActual().then((r) => {
       const datos = r.data.datos
       setCajaAbierta(datos?.estaAbierta || false, datos?.id)
       return datos
     }),
+    enabled: !!usuario?.id,
     retry: false,
     onError: () => setCajaAbierta(false),
   })
@@ -215,8 +216,22 @@ export default function Caja() {
   // Sesiones abiertas de todos (solo dueño)
   const { data: sesionesAbiertasData } = useQuery({
     queryKey: ['sesiones-abiertas'],
-    queryFn: () => getSesionesAbiertas().then((r) => r.data.datos),
+
+    queryFn: async () => {
+      const response = await getSesionesAbiertas()
+
+      return response.data.datos || []
+    },
+
     enabled: esDueno,
+
+    staleTime: 0,
+
+    refetchOnMount: 'always',
+
+    refetchOnWindowFocus: true,
+
+    retry: false,
   })
   const sesionesAbiertas = sesionesAbiertasData || []
 
@@ -237,9 +252,15 @@ export default function Caja() {
     mutationFn: abrirCaja,
     onSuccess: (res) => {
       setCajaAbierta(true, res.data.datos?.id)
-      queryClient.invalidateQueries(['caja-actual'])
-      queryClient.invalidateQueries(['sesiones-abiertas'])
-      queryClient.invalidateQueries(['dashboard'])
+      queryClient.invalidateQueries({
+        queryKey:['caja-actual'],
+      })
+      queryClient.invalidateQueries({
+        queryKey:['sesiones-abiertas'],
+      })
+      queryClient.invalidateQueries({
+        queryKey:['dashboard'],
+      })
       setSaldoApertura('')
       setCajeraId('')
       setError('')
