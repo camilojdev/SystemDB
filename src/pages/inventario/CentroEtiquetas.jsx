@@ -45,21 +45,228 @@ export default function CentroEtiquetas() {
 
   const handleGenerar = async () => {
     setError('')
+
     if (items.length === 0) {
       setError('Agrega al menos un producto a la cola')
       return
     }
+
+    /*
+     * IMPORTANTE:
+     *
+     * Abrimos la ventana INMEDIATAMENTE como consecuencia directa
+     * del clic del usuario.
+     *
+     * No esperamos al backend antes de hacer window.open().
+     * Esto evita que el navegador bloquee la ventana cuando
+     * la generación del PDF tarda varios segundos.
+     */
+    const ventanaPdf = window.open('', '_blank')
+
+    /*
+     * Si el navegador bloqueó la ventana, avisamos al usuario.
+     * Esto normalmente ocurre si el navegador tiene bloqueados
+     * los pop-ups.
+     */
+    if (!ventanaPdf) {
+      setError(
+        'El navegador bloqueó la ventana del PDF. Permite las ventanas emergentes para este sitio e inténtalo nuevamente.'
+      )
+      return
+    }
+
+    /*
+     * Mostramos algo mientras el servidor genera el PDF.
+     * De esta manera el usuario sabe que el proceso sigue activo.
+     */
+    ventanaPdf.document.write(`
+      <!DOCTYPE html>
+      <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Generando etiquetas...</title>
+          <style>
+            body {
+              margin: 0;
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: #f8fafc;
+              font-family: Arial, sans-serif;
+              color: #1e293b;
+            }
+
+            .contenedor {
+              text-align: center;
+              padding: 40px;
+            }
+
+            .spinner {
+              width: 46px;
+              height: 46px;
+              margin: 0 auto 20px;
+              border: 5px solid #e2e8f0;
+              border-top-color: #2563eb;
+              border-radius: 50%;
+              animation: girar 0.8s linear infinite;
+            }
+
+            h2 {
+              margin: 0 0 8px;
+              font-size: 22px;
+            }
+
+            p {
+              margin: 0;
+              color: #64748b;
+              font-size: 14px;
+            }
+
+            @keyframes girar {
+              to {
+                transform: rotate(360deg);
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="contenedor">
+            <div class="spinner"></div>
+            <h2>Generando etiquetas...</h2>
+            <p>Estamos preparando el PDF. Por favor espera.</p>
+          </div>
+        </body>
+      </html>
+    `)
+
+    /*
+     * Cerramos el documento que acabamos de escribir.
+     * La ventana permanece abierta.
+     */
+    ventanaPdf.document.close()
+
     setGenerando(true)
+
     try {
       const res = await generarEtiquetasPdf({
         plantillaCodigo: plantillaSeleccionada,
-        items: items.map((i) => ({ productoId: i.producto.id, cantidad: i.cantidad })),
+        items: items.map((i) => ({
+          productoId: i.producto.id,
+          cantidad: i.cantidad,
+        })),
       })
-      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
-      window.open(blobUrl, '_blank')
+
+      /*
+       * Creamos el Blob del PDF.
+       */
+      const blob = new Blob([res.data], {
+        type: 'application/pdf',
+      })
+
+      const blobUrl = window.URL.createObjectURL(blob)
+
+      /*
+       * Ahora que el PDF ya está listo, reutilizamos
+       * la ventana que abrimos anteriormente.
+       *
+       * Ya NO hacemos window.open() aquí.
+       */
+      ventanaPdf.location.href = blobUrl
+
+      /*
+       * La cola solamente se vacía DESPUÉS de que
+       * la generación del PDF haya terminado correctamente.
+       *
+       * Esto evita perder los productos si ocurre un error.
+       */
       vaciar()
+
+      /*
+       * Liberamos la URL del Blob después de un tiempo.
+       *
+       * No la liberamos inmediatamente porque el navegador
+       * todavía necesita utilizarla para mostrar el PDF.
+       */
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl)
+      }, 60000)
     } catch (err) {
+      /*
+       * Si ocurrió un error, NO vaciamos la cola.
+       * Los productos permanecen seleccionados para que
+       * el usuario pueda volver a intentar.
+       */
+
       setError('No se pudo generar el PDF de etiquetas')
+
+      /*
+       * Mostramos el error también dentro de la ventana
+       * que habíamos abierto.
+       */
+      try {
+        ventanaPdf.document.open()
+        ventanaPdf.document.write(`
+          <!DOCTYPE html>
+          <html lang="es">
+            <head>
+              <meta charset="UTF-8" />
+              <title>Error al generar etiquetas</title>
+              <style>
+                body {
+                  margin: 0;
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f8fafc;
+                  font-family: Arial, sans-serif;
+                  color: #1e293b;
+                }
+
+                .contenedor {
+                  text-align: center;
+                  padding: 40px;
+                  max-width: 500px;
+                }
+
+                .icono {
+                  font-size: 48px;
+                  margin-bottom: 15px;
+                }
+
+                h2 {
+                  margin: 0 0 10px;
+                  font-size: 22px;
+                  color: #dc2626;
+                }
+
+                p {
+                  margin: 0;
+                  color: #64748b;
+                  font-size: 14px;
+                  line-height: 1.5;
+                }
+              </style>
+            </head>
+
+            <body>
+              <div class="contenedor">
+                <div class="icono">⚠️</div>
+                <h2>No se pudo generar el PDF</h2>
+                <p>
+                  Ocurrió un error al generar las etiquetas.
+                  Los productos permanecen en la cola para que puedas intentarlo nuevamente.
+                </p>
+              </div>
+            </body>
+          </html>
+        `)
+        ventanaPdf.document.close()
+      } catch {
+        // Si la ventana ya no está disponible, no hacemos nada.
+      }
     } finally {
       setGenerando(false)
     }
@@ -68,14 +275,26 @@ export default function CentroEtiquetas() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-heading">Centro de Etiquetas</h1>
-        <p className="text-muted text-base mt-1">Busca productos, arma tu cola y genera el PDF de impresión</p>
+        <h1 className="text-3xl font-bold text-heading">
+          Centro de Etiquetas
+        </h1>
+
+        <p className="text-muted text-base mt-1">
+          Busca productos, arma tu cola y genera el PDF de impresión
+        </p>
       </div>
 
       <div className="card">
-        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">Buscar producto</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">
+          Buscar producto
+        </label>
+
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
+          />
+
           <input
             type="text"
             placeholder="Nombre o código..."
@@ -83,6 +302,7 @@ export default function CentroEtiquetas() {
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
           {sugerencias?.length > 0 && busqueda.length >= 2 && (
             <div className="absolute top-full mt-1 left-0 right-0 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg shadow-lg z-10 max-h-56 overflow-y-auto">
               {sugerencias.map((p) => (
@@ -91,8 +311,13 @@ export default function CentroEtiquetas() {
                   onClick={() => handleAgregarProducto(p)}
                   className="w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-sm border-b border-gray-100 dark:border-slate-700 last:border-0"
                 >
-                  <p className="font-medium text-heading">{p.nombre}</p>
-                  <p className="text-xs text-muted font-mono">{p.codigo}</p>
+                  <p className="font-medium text-heading">
+                    {p.nombre}
+                  </p>
+
+                  <p className="text-xs text-muted font-mono">
+                    {p.codigo}
+                  </p>
                 </button>
               ))}
             </div>
@@ -102,50 +327,89 @@ export default function CentroEtiquetas() {
 
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-heading">Cola de impresión</h2>
+          <h2 className="text-lg font-semibold text-heading">
+            Cola de impresión
+          </h2>
+
           {items.length > 0 && (
-            <button onClick={vaciar} className="text-xs text-muted hover:text-red-600 dark:hover:text-red-400">
+            <button
+              onClick={vaciar}
+              disabled={generando}
+              className="text-xs text-muted hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50"
+            >
               Vaciar
             </button>
           )}
         </div>
 
         {items.length === 0 ? (
-          <p className="text-sm text-muted py-6 text-center">La cola está vacía. Busca un producto para agregarlo.</p>
+          <p className="text-sm text-muted py-6 text-center">
+            La cola está vacía. Busca un producto para agregarlo.
+          </p>
         ) : (
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.producto.id} className="flex items-center gap-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">
+              <div
+                key={item.producto.id}
+                className="flex items-center gap-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2"
+              >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-heading truncate">{item.producto.nombre}</p>
-                  <p className="text-xs text-muted font-mono">{item.producto.codigo}</p>
+                  <p className="text-sm font-medium text-heading truncate">
+                    {item.producto.nombre}
+                  </p>
+
+                  <p className="text-xs text-muted font-mono">
+                    {item.producto.codigo}
+                  </p>
                 </div>
+
                 <input
                   type="number"
                   min={1}
                   value={item.cantidad}
-                  onChange={(e) => actualizarCantidad(item.producto.id, Number(e.target.value) || 1)}
-                  className="w-16 px-2 py-1 text-sm text-center bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg"
+                  disabled={generando}
+                  onChange={(e) =>
+                    actualizarCantidad(
+                      item.producto.id,
+                      Number(e.target.value) || 1
+                    )
+                  }
+                  className="w-16 px-2 py-1 text-sm text-center bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg disabled:opacity-50"
                 />
-                <button onClick={() => quitar(item.producto.id)} className="text-muted hover:text-red-600 dark:hover:text-red-400">
+
+                <button
+                  onClick={() => quitar(item.producto.id)}
+                  disabled={generando}
+                  className="text-muted hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50"
+                >
                   <Trash2 size={15} />
                 </button>
               </div>
             ))}
-            <p className="text-xs text-muted text-right pt-1">Total: {totalEtiquetas} etiqueta(s)</p>
+
+            <p className="text-xs text-muted text-right pt-1">
+              Total: {totalEtiquetas} etiqueta(s)
+            </p>
           </div>
         )}
       </div>
 
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-heading">Plantilla de impresión</h2>
+          <h2 className="text-lg font-semibold text-heading">
+            Plantilla de impresión
+          </h2>
+
           {esDueno && plantillaActual && (
             <button
               onClick={() => setEditandoPlantilla((v) => !v)}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
             >
-              <Settings size={13} /> {editandoPlantilla ? 'Cancelar' : 'Configurar medidas'}
+              <Settings size={13} />
+
+              {editandoPlantilla
+                ? 'Cancelar'
+                : 'Configurar medidas'}
             </button>
           )}
         </div>
@@ -155,7 +419,8 @@ export default function CentroEtiquetas() {
             <button
               key={p.codigo}
               onClick={() => setPlantillaSeleccionada(p.codigo)}
-              className={`px-3 py-2.5 rounded-lg text-sm font-medium border transition-colors text-left ${
+              disabled={generando}
+              className={`px-3 py-2.5 rounded-lg text-sm font-medium border transition-colors text-left disabled:opacity-50 ${
                 plantillaSeleccionada === p.codigo
                   ? 'bg-blue-600 border-blue-600 text-white'
                   : 'border-gray-200 dark:border-slate-600 text-heading hover:bg-gray-50 dark:hover:bg-slate-700'
@@ -171,14 +436,22 @@ export default function CentroEtiquetas() {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">
+          {error}
+        </p>
+      )}
 
       <button
         onClick={handleGenerar}
         disabled={generando || items.length === 0}
         className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-semibold flex items-center justify-center gap-2"
       >
-        <Printer size={18} /> {generando ? 'Generando...' : 'Generar PDF'}
+        <Printer size={18} />
+
+        {generando
+          ? `Generando ${totalEtiquetas} etiqueta(s)...`
+          : 'Generar PDF'}
       </button>
     </div>
   )
@@ -195,23 +468,46 @@ function FormularioPlantilla({ plantilla }) {
     separacionHorizontalMm: plantilla.separacionHorizontalMm,
     separacionVerticalMm: plantilla.separacionVerticalMm,
   })
+
   const [error, setError] = useState('')
   const [guardado, setGuardado] = useState(false)
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () => actualizarPlantillaEtiqueta(plantilla.codigo, form),
-    onSuccess: () => { setGuardado(true); setError(''); setTimeout(() => setGuardado(false), 2000) },
-    onError: (err) => setError(err.response?.data?.mensaje || 'No se pudo guardar'),
+    mutationFn: () =>
+      actualizarPlantillaEtiqueta(plantilla.codigo, form),
+
+    onSuccess: () => {
+      setGuardado(true)
+      setError('')
+
+      setTimeout(() => {
+        setGuardado(false)
+      }, 2000)
+    },
+
+    onError: (err) =>
+      setError(
+        err.response?.data?.mensaje ||
+          'No se pudo guardar'
+      ),
   })
 
   const campo = (label, name) => (
     <div>
-      <label className="block text-xs text-muted mb-1">{label}</label>
+      <label className="block text-xs text-muted mb-1">
+        {label}
+      </label>
+
       <input
         type="number"
         step="0.1"
         value={form[name]}
-        onChange={(e) => setForm({ ...form, [name]: Number(e.target.value) })}
+        onChange={(e) =>
+          setForm({
+            ...form,
+            [name]: Number(e.target.value),
+          })
+        }
         className="w-full px-2 py-1.5 text-sm bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg"
       />
     </div>
@@ -222,6 +518,7 @@ function FormularioPlantilla({ plantilla }) {
       <p className="text-xs text-muted">
         Ajusta estas medidas si cambias de proveedor de hojas o de impresora. Todo en milímetros.
       </p>
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {campo('Ancho etiqueta', 'anchoMm')}
         {campo('Alto etiqueta', 'altoMm')}
@@ -232,14 +529,27 @@ function FormularioPlantilla({ plantilla }) {
         {campo('Separación horiz.', 'separacionHorizontalMm')}
         {campo('Separación vert.', 'separacionVerticalMm')}
       </div>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
-      {guardado && <p className="text-xs text-green-600 dark:text-green-400">Guardado</p>}
+
+      {error && (
+        <p className="text-xs text-red-600 dark:text-red-400">
+          {error}
+        </p>
+      )}
+
+      {guardado && (
+        <p className="text-xs text-green-600 dark:text-green-400">
+          Guardado
+        </p>
+      )}
+
       <button
         onClick={() => mutate()}
         disabled={isPending}
         className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-lg"
       >
-        {isPending ? 'Guardando...' : 'Guardar medidas'}
+        {isPending
+          ? 'Guardando...'
+          : 'Guardar medidas'}
       </button>
     </div>
   )

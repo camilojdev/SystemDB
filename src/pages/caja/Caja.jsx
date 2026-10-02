@@ -172,7 +172,7 @@ export default function Caja() {
   const queryClient = useQueryClient()
   const usuario = useAuthStore((s) => s.usuario)
   const esDueno = usuario?.rol === 'DUENO'
-
+  const puedeCerrarCaja = usuario?.rol === 'DUENO' || !!usuario?.permisos?.puedeCerrarCaja
   const [tab, setTab] = useState('sesion')
   const [cajeraId, setCajeraId] = useState('')
   const [saldoApertura, setSaldoApertura] = useState('')
@@ -193,12 +193,13 @@ export default function Caja() {
 
   // Sesión del usuario actual
   const { data: cajaData, isLoading } = useQuery({
-    queryKey: ['caja-actual'],
+    queryKey: ['caja-actual', usuario?.id],
     queryFn: () => getCajaActual().then((r) => {
       const datos = r.data.datos
       setCajaAbierta(datos?.estaAbierta || false, datos?.id)
       return datos
     }),
+    enabled: !!usuario?.id,
     retry: false,
     onError: () => setCajaAbierta(false),
   })
@@ -215,8 +216,22 @@ export default function Caja() {
   // Sesiones abiertas de todos (solo dueño)
   const { data: sesionesAbiertasData } = useQuery({
     queryKey: ['sesiones-abiertas'],
-    queryFn: () => getSesionesAbiertas().then((r) => r.data.datos),
+
+    queryFn: async () => {
+      const response = await getSesionesAbiertas()
+
+      return response.data.datos || []
+    },
+
     enabled: esDueno,
+
+    staleTime: 0,
+
+    refetchOnMount: 'always',
+
+    refetchOnWindowFocus: true,
+
+    retry: false,
   })
   const sesionesAbiertas = sesionesAbiertasData || []
 
@@ -237,9 +252,15 @@ export default function Caja() {
     mutationFn: abrirCaja,
     onSuccess: (res) => {
       setCajaAbierta(true, res.data.datos?.id)
-      queryClient.invalidateQueries(['caja-actual'])
-      queryClient.invalidateQueries(['sesiones-abiertas'])
-      queryClient.invalidateQueries(['dashboard'])
+      queryClient.invalidateQueries({
+        queryKey:['caja-actual'],
+      })
+      queryClient.invalidateQueries({
+        queryKey:['sesiones-abiertas'],
+      })
+      queryClient.invalidateQueries({
+        queryKey:['dashboard'],
+      })
       setSaldoApertura('')
       setCajeraId('')
       setError('')
@@ -410,6 +431,29 @@ export default function Caja() {
         </div>
       )}
 
+      {/* Abrir mi caja — cajera con permiso */}
+      {!esDueno && puedeCerrarCaja && !cajaAbierta && !isLoading && (
+        <div className="card max-w-md">
+          <h2 className="text-lg font-semibold text-heading mb-4 flex items-center gap-2">
+            <Unlock size={16} className="text-green-600 dark:text-green-400" />
+            Abrir mi caja
+          </h2>
+          <form onSubmit={handleAbrir} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-heading mb-1">Saldo inicial (COP)</label>
+              <input type="number" placeholder="Ej: 200000" value={saldoApertura}
+                onChange={(e) => setSaldoApertura(e.target.value)}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
+            <button type="submit" disabled={abriendo}
+              className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
+              {abriendo ? 'Abriendo...' : 'Abrir caja'}
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Mi sesión actual */}
       {cajaAbierta && sesion && (
         <>
@@ -446,7 +490,7 @@ export default function Caja() {
             {[
               { key: 'sesion', label: 'Movimientos' },
               { key: 'gasto', label: 'Registrar gasto' },
-              ...(esDueno ? [{ key: 'cierre', label: 'Cerrar caja' }] : []),
+              ...(puedeCerrarCaja ? [{ key: 'cierre', label: 'Cerrar caja' }] : []),
             ].map((t) => (
               <button key={t.key} onClick={() => { setTab(t.key); setError('') }}
                 className={`px-3 sm:px-4 py-2.5 text-sm sm:text-base font-medium border-b-2 whitespace-nowrap transition-colors ${
@@ -503,7 +547,7 @@ export default function Caja() {
             </div>
           )}
 
-          {tab === 'cierre' && esDueno && (
+          {tab === 'cierre' && puedeCerrarCaja && (
             <div className="card max-w-md">
               <h3 className="text-lg font-semibold text-heading mb-1 flex items-center gap-2">
                 <AlertTriangle size={16} className="text-orange-500" />
@@ -558,7 +602,7 @@ export default function Caja() {
       )}
 
       {/* Cajera sin caja abierta */}
-      {!esDueno && !cajaAbierta && !isLoading && (
+      {!esDueno && !puedeCerrarCaja && !cajaAbierta && !isLoading && (
         <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-6 text-center">
           <Lock size={32} className="text-yellow-500 mx-auto mb-3" />
           <p className="font-medium text-heading mb-1">Tu caja está cerrada</p>

@@ -70,7 +70,12 @@ export default function Sidebar({ abierto = false, onCerrar = () => {} }) {
 
   const esMecanico = usuario?.rol === 'MECANICO'
   const esCajera = usuario?.rol === 'CAJERA'
-  const navItems = esMecanico ? NAV_MECANICO : esCajera ? NAV_CAJERA : NAV_DUENO
+    const permisosUsuario = usuario?.permisos || {}
+  const navItemsCajera = permisosUsuario.puedeGestionarInventario
+    ? [NAV_CAJERA[0], NAV_CAJERA[1], { to: '/inventario', icon: Package, label: 'Inventario' }, ...NAV_CAJERA.slice(2)]
+    : NAV_CAJERA
+
+  const navItems = esMecanico ? NAV_MECANICO : esCajera ? navItemsCajera : NAV_DUENO
 
   const handleLogout = async () => {
     if (cajaAbierta) {
