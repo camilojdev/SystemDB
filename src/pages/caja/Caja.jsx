@@ -29,7 +29,6 @@ function generarCierrePDF(sesion) {
   doc.text(`Cierre: ${sesion.cerradaEn ? new Date(sesion.cerradaEn).toLocaleString('es-CO') : '—'}`, 14, 54)
   doc.line(14, 59, 196, 59)
 
-  // Resumen
   let y = 67
   doc.setFont('helvetica', 'bold')
   doc.text('RESUMEN DE LA SESIÓN', 14, y); y += 8
@@ -48,7 +47,6 @@ function generarCierrePDF(sesion) {
     y += 7
   })
 
-  // Desglose método pago
   y += 3
   doc.line(14, y, 196, y); y += 7
   doc.setFont('helvetica', 'bold')
@@ -64,7 +62,6 @@ function generarCierrePDF(sesion) {
     y += 7
   })
 
-  // Cierre
   y += 3
   doc.line(14, y, 196, y); y += 7
   doc.setFont('helvetica', 'bold')
@@ -90,7 +87,6 @@ function generarCierrePDF(sesion) {
     doc.text(sesion.notasCierre, 14, y); y += 10
   }
 
-  // Movimientos
   if (sesion.movimientos?.length > 0) {
     doc.line(14, y, 196, y); y += 7
     doc.setFont('helvetica', 'bold')
@@ -173,15 +169,24 @@ export default function Caja() {
   const usuario = useAuthStore((s) => s.usuario)
   const esDueno = usuario?.rol === 'DUENO'
   const puedeCerrarCaja = usuario?.rol === 'DUENO' || !!usuario?.permisos?.puedeCerrarCaja
+
   const [tab, setTab] = useState('sesion')
   const [cajeraId, setCajeraId] = useState('')
   const [saldoApertura, setSaldoApertura] = useState('')
+
+  // Cerrar MI propia sesión (dentro del bloque de mi caja)
+  const [saldoCierrePropia, setSaldoCierrePropia] = useState('')
+  const [notasCierrePropia, setNotasCierrePropia] = useState('')
+
+  // Cerrar la sesión de CUALQUIER cajera (tarjeta independiente, solo DUEÑO)
   const [sesionCierreId, setSesionCierreId] = useState('')
   const [saldoCierre, setSaldoCierre] = useState('')
   const [notasCierre, setNotasCierre] = useState('')
+
   const [montoGasto, setMontoGasto] = useState('')
   const [descGasto, setDescGasto] = useState('')
   const [error, setError] = useState('')
+  const [errorCierreOtra, setErrorCierreOtra] = useState('')
   const [tabHistorial, setTabHistorial] = useState(false)
   const [filtroCajeraId, setFiltroCajeraId] = useState('')
   const [filtroDesde, setFiltroDesde] = useState('')
@@ -191,15 +196,13 @@ export default function Caja() {
 
   const setCajaAbierta = useCajaStore((s) => s.setCajaAbierta)
 
-  // Sesión del usuario actual
   const { data: cajaData, isLoading } = useQuery({
-    queryKey: ['caja-actual', usuario?.id],
+    queryKey: ['caja-actual'],
     queryFn: () => getCajaActual().then((r) => {
       const datos = r.data.datos
       setCajaAbierta(datos?.estaAbierta || false, datos?.id)
       return datos
     }),
-    enabled: !!usuario?.id,
     retry: false,
     onError: () => setCajaAbierta(false),
   })
@@ -213,29 +216,13 @@ export default function Caja() {
   const historial = historialData?.content || []
   const totalPaginasHistorial = historialData?.totalPages || 1
 
-  // Sesiones abiertas de todos (solo dueño)
   const { data: sesionesAbiertasData } = useQuery({
     queryKey: ['sesiones-abiertas'],
-
-    queryFn: async () => {
-      const response = await getSesionesAbiertas()
-
-      return response.data.datos || []
-    },
-
+    queryFn: () => getSesionesAbiertas().then((r) => r.data.datos),
     enabled: esDueno,
-
-    staleTime: 0,
-
-    refetchOnMount: 'always',
-
-    refetchOnWindowFocus: true,
-
-    retry: false,
   })
   const sesionesAbiertas = sesionesAbiertasData || []
 
-  // Usuarios cajeras (para abrir caja a nombre de alguien)
   const { data: usuariosData } = useQuery({
     queryKey: ['usuarios'],
     queryFn: () => getUsuarios().then((r) => r.data.datos),
@@ -252,15 +239,9 @@ export default function Caja() {
     mutationFn: abrirCaja,
     onSuccess: (res) => {
       setCajaAbierta(true, res.data.datos?.id)
-      queryClient.invalidateQueries({
-        queryKey:['caja-actual'],
-      })
-      queryClient.invalidateQueries({
-        queryKey:['sesiones-abiertas'],
-      })
-      queryClient.invalidateQueries({
-        queryKey:['dashboard'],
-      })
+      queryClient.invalidateQueries(['caja-actual'])
+      queryClient.invalidateQueries(['sesiones-abiertas'])
+      queryClient.invalidateQueries(['dashboard'])
       setSaldoApertura('')
       setCajeraId('')
       setError('')
@@ -268,7 +249,8 @@ export default function Caja() {
     onError: (err) => setError(err.response?.data?.mensaje || 'Error al abrir caja'),
   })
 
-  const { mutate: cerrar, isPending: cerrando } = useMutation({
+  // Cierra MI propia sesión activa
+  const { mutate: cerrarPropia, isPending: cerrandoPropia } = useMutation({
     mutationFn: cerrarCaja,
     onSuccess: () => {
       setCajaAbierta(false)
@@ -276,13 +258,28 @@ export default function Caja() {
       queryClient.invalidateQueries(['sesiones-abiertas'])
       queryClient.invalidateQueries(['historial-caja'])
       queryClient.invalidateQueries(['dashboard'])
-      setSaldoCierre('')
-      setNotasCierre('')
-      setSesionCierreId('')
+      setSaldoCierrePropia('')
+      setNotasCierrePropia('')
       setError('')
       setTab('sesion')
     },
     onError: (err) => setError(err.response?.data?.mensaje || 'Error al cerrar caja'),
+  })
+
+  // Cierra la sesión de CUALQUIER cajera, sin depender de mi propia caja
+  const { mutate: cerrarOtra, isPending: cerrandoOtra } = useMutation({
+    mutationFn: cerrarCaja,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['sesiones-abiertas'])
+      queryClient.invalidateQueries(['historial-caja'])
+      queryClient.invalidateQueries(['dashboard'])
+      queryClient.invalidateQueries(['caja-actual'])
+      setSesionCierreId('')
+      setSaldoCierre('')
+      setNotasCierre('')
+      setErrorCierreOtra('')
+    },
+    onError: (err) => setErrorCierreOtra(err.response?.data?.mensaje || 'Error al cerrar la sesión'),
   })
 
   const { mutate: gasto, isPending: guardandoGasto } = useMutation({
@@ -306,22 +303,26 @@ export default function Caja() {
     })
   }
 
-  const handleCerrar = (e) => {
+  // Cerrar MI propia caja — siempre usa mi sesión actual, sin selector
+  const handleCerrarPropia = (e) => {
     e.preventDefault()
     setError('')
-    if (!saldoCierre) { setError('Ingresa el efectivo contado'); return }
-    
-    // Si solo hay una sesión abierta, usarla automáticamente
-    const idSesion = sesionCierreId 
-      ? Number(sesionCierreId) 
-      : sesionesAbiertas.length === 1 
-        ? sesionesAbiertas[0].id 
-        : sesion?.id
+    if (!saldoCierrePropia) { setError('Ingresa el efectivo contado'); return }
+    cerrarPropia({
+      sesionId: sesion.id,
+      saldoFinalContadoCop: Number(saldoCierrePropia),
+      notas: notasCierrePropia,
+    })
+  }
 
-    if (!idSesion) { setError('Selecciona la sesión a cerrar'); return }
-
-    cerrar({
-      sesionId: idSesion,
+  // Cerrar la caja de CUALQUIER cajera — tarjeta independiente (solo DUEÑO)
+  const handleCerrarOtra = (e) => {
+    e.preventDefault()
+    setErrorCierreOtra('')
+    if (!sesionCierreId) { setErrorCierreOtra('Selecciona la sesión a cerrar'); return }
+    if (!saldoCierre) { setErrorCierreOtra('Ingresa el efectivo contado'); return }
+    cerrarOtra({
+      sesionId: Number(sesionCierreId),
       saldoFinalContadoCop: Number(saldoCierre),
       notas: notasCierre,
     })
@@ -398,7 +399,7 @@ export default function Caja() {
         </div>
       )}
 
-      {/* Abrir caja — solo dueño */}
+      {/* Abrir caja — solo dueño, para cualquier cajera o para sí mismo */}
       {esDueno && !isLoading && (
         <div className="card max-w-md">
           <h2 className="text-lg font-semibold text-heading mb-4 flex items-center gap-2">
@@ -422,7 +423,7 @@ export default function Caja() {
                 onChange={(e) => setSaldoApertura(e.target.value)}
                 className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
-            {error && tab !== 'cierre' && tab !== 'gasto' && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
             <button type="submit" disabled={abriendo}
               className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
               {abriendo ? 'Abriendo...' : 'Abrir caja'}
@@ -431,7 +432,7 @@ export default function Caja() {
         </div>
       )}
 
-      {/* Abrir mi caja — cajera con permiso */}
+      {/* Abrir mi caja — cajera con el permiso, nunca ve la de abrir para cualquiera */}
       {!esDueno && puedeCerrarCaja && !cajaAbierta && !isLoading && (
         <div className="card max-w-md">
           <h2 className="text-lg font-semibold text-heading mb-4 flex items-center gap-2">
@@ -449,6 +450,51 @@ export default function Caja() {
             <button type="submit" disabled={abriendo}
               className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
               {abriendo ? 'Abriendo...' : 'Abrir caja'}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Cerrar una sesión activa — SOLO DUEÑO, independiente de si su propia caja está abierta o no */}
+      {esDueno && sesionesAbiertas.length > 0 && (
+        <div className="card max-w-md">
+          <h2 className="text-lg font-semibold text-heading mb-1 flex items-center gap-2">
+            <AlertTriangle size={16} className="text-orange-500" />
+            Cerrar una sesión activa
+          </h2>
+          <p className="text-sm text-muted mb-3">
+            No depende de que tu propia caja esté abierta — puedes cerrar la caja de cualquier cajera desde aquí.
+          </p>
+          <form onSubmit={handleCerrarOtra} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-heading mb-1">Sesión a cerrar</label>
+              <select value={sesionCierreId} onChange={(e) => setSesionCierreId(e.target.value)}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccionar cajera</option>
+                {sesionesAbiertas.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.cajera} — Saldo esperado: {formatCOP(s.saldoEsperadoCop)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-heading mb-1">Efectivo contado (COP)</label>
+              <input type="number" placeholder="Ingresa el dinero contado en caja"
+                value={saldoCierre} onChange={(e) => setSaldoCierre(e.target.value)}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-heading mb-1">Notas de cierre (opcional)</label>
+              <textarea placeholder="Observaciones del turno..."
+                value={notasCierre} onChange={(e) => setNotasCierre(e.target.value)}
+                rows={2}
+                className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+            </div>
+            {errorCierreOtra && <p className="text-red-500 dark:text-red-400 text-sm">{errorCierreOtra}</p>}
+            <button type="submit" disabled={cerrandoOtra}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
+              {cerrandoOtra ? 'Cerrando...' : 'Cerrar sesión'}
             </button>
           </form>
         </div>
@@ -490,7 +536,7 @@ export default function Caja() {
             {[
               { key: 'sesion', label: 'Movimientos' },
               { key: 'gasto', label: 'Registrar gasto' },
-              ...(puedeCerrarCaja ? [{ key: 'cierre', label: 'Cerrar caja' }] : []),
+              ...(puedeCerrarCaja ? [{ key: 'cierre', label: 'Cerrar mi caja' }] : []),
             ].map((t) => (
               <button key={t.key} onClick={() => { setTab(t.key); setError('') }}
                 className={`px-3 sm:px-4 py-2.5 text-sm sm:text-base font-medium border-b-2 whitespace-nowrap transition-colors ${
@@ -551,57 +597,34 @@ export default function Caja() {
             <div className="card max-w-md">
               <h3 className="text-lg font-semibold text-heading mb-1 flex items-center gap-2">
                 <AlertTriangle size={16} className="text-orange-500" />
-                Cerrar sesión de caja
+                Cerrar mi caja
               </h3>
-              <form onSubmit={handleCerrar} className="space-y-3 mt-4">
-                {sesionesAbiertas.length > 1 && (
-                  <div>
-                    <label className="block text-sm font-medium text-heading mb-1">Sesión a cerrar</label>
-                    <select value={sesionCierreId} onChange={(e) => setSesionCierreId(e.target.value)}
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Seleccionar cajera</option>
-                      {sesionesAbiertas.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.cajera} — Saldo esperado: {formatCOP(s.saldoEsperadoCop)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+              <form onSubmit={handleCerrarPropia} className="space-y-3 mt-4">
                 <div>
                   <label className="block text-sm font-medium text-heading mb-1">Efectivo contado (COP)</label>
                   <input type="number" placeholder="Ingresa el dinero contado en caja"
-                    value={saldoCierre} onChange={(e) => setSaldoCierre(e.target.value)}
+                    value={saldoCierrePropia} onChange={(e) => setSaldoCierrePropia(e.target.value)}
                     className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-heading mb-1">Notas de cierre (opcional)</label>
                   <textarea placeholder="Observaciones del turno..."
-                    value={notasCierre} onChange={(e) => setNotasCierre(e.target.value)}
+                    value={notasCierrePropia} onChange={(e) => setNotasCierrePropia(e.target.value)}
                     rows={2}
                     className="w-full px-3 py-2 bg-white dark:bg-slate-900/50 border border-gray-300 dark:border-slate-600 text-heading rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                 </div>
                 {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
-                <button type="submit" disabled={cerrando}
+                <button type="submit" disabled={cerrandoPropia}
                   className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
-                  {cerrando ? 'Cerrando...' : 'Cerrar caja'}
+                  {cerrandoPropia ? 'Cerrando...' : 'Cerrar caja'}
                 </button>
               </form>
-              {/*Boton para generar PDF de cierre en previsualizacion*/} 
-              {/* {tab === 'cierre' && esDueno && cajaAbierta && sesion && (
-                  <button
-                    onClick={() => generarCierrePDF(sesion)}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg text-sm font-medium"
-                  >
-                    <Download size={14} /> Previsualizar PDF cierre
-                  </button>
-                )}*/}
             </div>
           )}
         </>
       )}
 
-      {/* Cajera sin caja abierta */}
+      {/* Cajera sin caja abierta ni permiso para abrir la suya */}
       {!esDueno && !puedeCerrarCaja && !cajaAbierta && !isLoading && (
         <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 rounded-xl p-6 text-center">
           <Lock size={32} className="text-yellow-500 mx-auto mb-3" />
@@ -614,7 +637,6 @@ export default function Caja() {
         <div className="card space-y-4">
           <h2 className="text-lg font-semibold text-heading">Historial de cajas cerradas</h2>
 
-          {/* Filtros */}
           <div className="flex items-end gap-3 flex-wrap">
             <div>
               <label className="block text-sm font-medium text-muted mb-1">Cajera</label>
@@ -645,7 +667,6 @@ export default function Caja() {
             </button>
           </div>
 
-          {/* Tabla */}
           {cargandoHistorial ? (
             <div className="flex justify-center py-8">
               <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
